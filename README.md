@@ -36,5 +36,5 @@ type TagContent = (TagElement | string)[];
 
 ## Usage
 ```jsx
-<Html collapse={false}>{replaceTags(body)}</Html>
+<Html collapse={false}>{htmlText}</Html>
 ```
