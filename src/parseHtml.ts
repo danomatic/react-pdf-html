@@ -3,22 +3,23 @@ import {
   Node as HTMLNode,
   NodeType,
   parse,
+  TextNode,
 } from 'node-html-parser';
 
-export type TagContent = (TagElement | string)[];
+export type HtmlContent = (HtmlElement | string)[];
 
-export type TagElement = {
+export type HtmlElement = {
   tag: string;
   attributes: Record<string, string>;
-  content: TagContent;
+  content: HtmlContent;
   parentTag?: string;
   index?: number;
   indexOfKind?: number;
 };
 
-export const fromHtmlElement = (node: HTMLNode): TagElement | string => {
+export const convertNode = (node: HTMLNode): HtmlElement | string => {
   if (node.nodeType === NodeType.TEXT_NODE) {
-    return node.innerText;
+    return (node as TextNode).innerText;
   }
   if (node.nodeType === NodeType.COMMENT_NODE) {
     return '';
@@ -28,7 +29,7 @@ export const fromHtmlElement = (node: HTMLNode): TagElement | string => {
   }
   const html = node as HTMLElement;
   const tag = html.tagName;
-  const content = html.childNodes.map(fromHtmlElement);
+  const content = html.childNodes.map(convertNode);
   const kindCounters: Record<string, number> = {};
   content.forEach((child, index) => {
     if (typeof child !== 'string') {
@@ -50,9 +51,9 @@ export const fromHtmlElement = (node: HTMLNode): TagElement | string => {
   };
 };
 
-const parseHtml = (text: string): TagContent => {
+const parseHtml = (text: string): HtmlContent => {
   const html = parse(text);
-  return html.childNodes.map(fromHtmlElement);
+  return html.childNodes.map(convertNode);
 };
 
 export default parseHtml;

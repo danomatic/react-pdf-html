@@ -1,18 +1,78 @@
 import React, { ReactElement } from 'react';
-import tags, { isBlock, TagValue } from './tags';
-import { Text } from '@react-pdf/renderer';
-import parseHtml, { TagContent, TagElement } from './parseHtml';
+import renderers, { renderBlock, renderInline } from './renderers';
+import { Text, View } from '@react-pdf/renderer';
+import parseHtml, { HtmlContent, HtmlElement } from './parseHtml';
+import { createHtmlStylesheet, HtmlStyles } from './styles';
+import { Style } from '@react-pdf/types';
+
+export type Tag =
+  | 'HTML'
+  | 'BODY'
+  | 'HEAD'
+  | 'TITLE'
+  | 'H1'
+  | 'H2'
+  | 'H3'
+  | 'H4'
+  | 'H5'
+  | 'H6'
+  | 'DIV'
+  | 'P'
+  | 'B'
+  | 'STRONG'
+  | 'I'
+  | 'U'
+  | 'S'
+  | 'A'
+  | 'UL'
+  | 'OL'
+  | 'LI'
+  | 'TABLE'
+  | 'TR'
+  | 'TD';
+
+export const isBlock: Record<Tag, boolean> = {
+  HTML: true,
+  BODY: true,
+  HEAD: true,
+  TITLE: true,
+  H1: true,
+  H2: true,
+  H3: true,
+  H4: true,
+  H5: true,
+  H6: true,
+
+  DIV: true,
+  P: true,
+
+  B: false,
+  STRONG: false,
+  I: false,
+  U: false,
+  S: false,
+
+  A: false,
+
+  TABLE: true,
+  TR: true,
+  TD: true,
+
+  UL: true,
+  OL: true,
+  LI: true,
+};
 
 type ContentBucket = {
   hasBlock: boolean;
-  content: TagContent;
+  content: HtmlContent;
 };
 
-export const hasBlockContent = (element: TagElement | string): boolean => {
+export const hasBlockContent = (element: HtmlElement | string): boolean => {
   if (typeof element === 'string') {
     return false;
   }
-  if (isBlock[element.tag as TagValue]) {
+  if (isBlock[element.tag as Tag]) {
     return true;
   }
   if (element.content) {
@@ -21,15 +81,31 @@ export const hasBlockContent = (element: TagElement | string): boolean => {
   return false;
 };
 
+const ltrim = (text: string): string => text.replace(/^\s+/, '');
+const rtrim = (text: string): string => text.replace(/\s+$/, '');
+
 /**
  * Groups all blocka and non-block elements into buckets so that all non-block elements can be rendered in a parent Text element
- * @param elements
+ * @param elements Elements to place in buckets of block and non-block content
  */
-export const bucketElements = (elements: TagContent): ContentBucket[] => {
+export const bucketElements = (elements: HtmlContent): ContentBucket[] => {
   let bucket: ContentBucket;
   let hasBlock: boolean;
   const buckets: ContentBucket[] = [];
-  elements.forEach((element) => {
+  elements.forEach((element, index) => {
+    // clear empty strings between block elements
+    if (typeof element === 'string') {
+      if (hasBlock || hasBlock === undefined) {
+        element = ltrim(element);
+      }
+      const next = elements[index + 1];
+      if (next && hasBlockContent(next)) {
+        element = rtrim(element);
+      }
+      if (element === '') {
+        return;
+      }
+    }
     const block = hasBlockContent(element);
     if (block !== hasBlock) {
       hasBlock = block;
@@ -45,24 +121,27 @@ export const bucketElements = (elements: TagContent): ContentBucket[] => {
   return buckets;
 };
 
-export const renderer = (
-  element: TagElement | string,
+export const defaultRenderer: HtmlContentRenderer = (
+  element: HtmlElement | string,
+  stylesheet: HtmlStyles,
+  renderers: HtmlRenderers,
   children?: any,
   index?: number
 ): ReactElement | string => {
   if (typeof element === 'string') {
     return element;
   }
-  const Element = tags[element.tag as TagValue];
+  let Element: HtmlRenderer | undefined = renderers[element.tag as Tag];
   if (!Element) {
-    throw new Error(`Tag ${element.tag} not yet supported`);
+    Element = hasBlockContent(element) ? renderBlock : renderInline;
   }
-  return children?.length > 0 ? (
-    <Element key={index} {...element}>
-      {children}
-    </Element>
-  ) : (
-    <Element key={index} {...element} />
+  return (
+    <Element
+      key={index}
+      children={children}
+      element={element}
+      stylesheet={stylesheet}
+    />
   );
 };
 
@@ -70,18 +149,23 @@ const collapseWhitespace = (string: any): string =>
   string.replace(/(\s+)/g, ' ');
 
 export const renderElements = (
-  elements: TagContent,
+  elements: HtmlContent,
   options: HtmlRenderOptions
 ): ReactElement[] => {
   const buckets = bucketElements(elements);
   return buckets.map((bucket, bucketIndex) => {
     const rendered = bucket.content.map((element, index) => {
       const isString = typeof element === 'string';
+      if (isString && options.collapse) {
+        element = collapseWhitespace(element);
+      }
       return options.renderer(
-        isString && options.collapse ? collapseWhitespace(element) : element,
+        element,
+        options.stylesheet,
+        options.renderers,
         isString
-          ? []
-          : renderElements((element as TagElement).content, options),
+          ? undefined
+          : renderElements((element as HtmlElement).content, options),
         index
       );
     });
@@ -93,27 +177,53 @@ export const renderElements = (
   });
 };
 
-export type ElementRenderer = (
-  element: TagElement | string,
+export type HtmlRenderer = React.FC<{
+  element: HtmlElement;
+  stylesheet: HtmlStyles;
+}>;
+
+export type HtmlRenderers = Partial<Record<Tag, HtmlRenderer>>;
+
+export type HtmlContentRenderer = (
+  element: HtmlElement | string,
+  stylesheet: HtmlStyles,
+  renderers: HtmlRenderers,
   children?: any,
   index?: number
 ) => ReactElement | string;
 
 export type HtmlRenderOptions = {
   collapse: boolean;
-  renderer: ElementRenderer;
-};
-
-const defaults: HtmlRenderOptions = {
-  collapse: false,
-  renderer,
+  renderer: HtmlContentRenderer;
+  renderers: HtmlRenderers;
+  style: Style;
+  stylesheet: HtmlStyles;
 };
 
 const renderHtml = (
   text: string,
   options: Partial<HtmlRenderOptions> = {}
-): ReactElement[] => {
-  return renderElements(parseHtml(text), { ...defaults, ...options });
+): ReactElement => {
+  const defaultFontSize = 18;
+  const fontSize =
+    typeof options.style?.fontSize === 'number'
+      ? options.style.fontSize
+      : defaultFontSize;
+  const defaults: HtmlRenderOptions = {
+    collapse: true,
+    renderer: defaultRenderer,
+    renderers,
+    style: {},
+    stylesheet: createHtmlStylesheet(fontSize, options.stylesheet),
+  };
+  const opts = { ...defaults, ...options };
+  const parsed = parseHtml(text);
+
+  return (
+    <View style={{ ...options.style, fontSize }}>
+      {renderElements(parsed, opts)}
+    </View>
+  );
 };
 
 export default renderHtml;
