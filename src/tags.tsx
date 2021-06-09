@@ -83,6 +83,10 @@ export const styles = StyleSheet.create({
 });
 
 export type TagValue =
+  | 'HTML'
+  | 'BODY'
+  | 'HEAD'
+  | 'TITLE'
   | 'H1'
   | 'H2'
   | 'H3'
@@ -105,6 +109,10 @@ export type TagValue =
   | 'TD';
 
 export const isBlock: Record<TagValue, boolean> = {
+  HTML: true,
+  BODY: true,
+  HEAD: true,
+  TITLE: true,
   H1: true,
   H2: true,
   H3: true,
@@ -132,6 +140,8 @@ export const isBlock: Record<TagValue, boolean> = {
   LI: true,
 };
 
+const noop: React.FC<TagElement> = ({ tag, children }) => <>{children}</>;
+
 const defaultBlock: React.FC<TagElement> = ({ tag, children }) => (
   <View style={(styles as any)[tag]}>{children}</View>
 );
@@ -141,6 +151,10 @@ const defaultInline: React.FC<TagElement> = ({ tag, children }) => (
 );
 
 const tags: Record<TagValue, React.FC<TagElement>> = {
+  HTML: noop,
+  HEAD: noop,
+  TITLE: noop,
+  BODY: defaultBlock,
   H1: defaultBlock,
   H2: defaultBlock,
   H3: defaultBlock,
