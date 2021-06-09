@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, Text, View } from '@react-pdf/renderer';
-import {HtmlRenderer, HtmlRenderers, Tag} from './renderHtml';
+import { HtmlRenderer, HtmlRenderers, Tag } from './renderHtml';
 
 export const renderNoop: HtmlRenderer = ({ children }) => <></>;
 
@@ -8,11 +8,7 @@ export const renderBlock: HtmlRenderer = ({
   element,
   stylesheet,
   children,
-}) => (
-  <View style={(stylesheet as any)[element.tag]}>
-    {children}
-  </View>
-);
+}) => <View style={(stylesheet as any)[element.tag]}>{children}</View>;
 
 export const renderInline: HtmlRenderer = ({
   element,
@@ -40,8 +36,11 @@ const renderers: HtmlRenderers = {
     );
   },
   A: ({ stylesheet, element, children }) => (
-    <Link style={stylesheet.U} src={(element.content as unknown) as string}>
-      {element.content}
+    <Link
+      style={stylesheet.U}
+      src={element.attributes.href ?? (element.content[0] as string)}
+    >
+      {element.content[0] as string}
     </Link>
   ),
 };
