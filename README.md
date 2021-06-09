@@ -12,7 +12,7 @@ Hopefully the author of `react-pdf` will simply incorpoerate it so that the comm
 
 ## Usage
 
-```jsx
+```tsx
 const html = `<html>
   <body>
     <h1>Heading 1</h1>
@@ -38,7 +38,7 @@ const html = `<html>
 </html>
 `;
 
-<Html>{html}</Html>;
+return <Html>{html}</Html>;
 ```
 
 ## Props
@@ -65,5 +65,27 @@ const stylesheet = {
   },
 };
 
-<Html stylesheet={stylesheet}>{html}</Html>;
+return <Html stylesheet={stylesheet}>{html}</Html>;
 ```
+
+## Font Sizes
+The default styesheet roughly matches browser defaults, using a rough emulation of ems:
+```tsx
+const em = (em: number, relativeSize: number = fontSize) => em * relativeSize;
+
+StyleSheet.create({
+  H1: {
+    fontSize: em(2),
+    marginVertical: em(0.67, em(2)),
+    fontWeight: 'bold',
+  },
+  ...
+});
+```
+
+By default, the basis for the font size ems is based on `props.style.fontSize`:
+```tsx
+return <Html style={{ fontSize: 10 }}>{html}</Html>
+```
+
+If this is not defined, it falls back to a default of `18`
