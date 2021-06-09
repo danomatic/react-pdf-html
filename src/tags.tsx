@@ -5,32 +5,32 @@ import { TagElement } from './parseHtml';
 const emToPx = (em: string) => parseFloat(em) * 12;
 
 export const styles = StyleSheet.create({
-  h1: {
+  H1: {
     fontSize: emToPx('2em'),
     marginVertical: emToPx('0.67em'),
     fontWeight: 'bold',
   },
-  h2: {
+  H2: {
     fontSize: emToPx('1.5em'),
     marginVertical: emToPx('0.83em'),
     fontWeight: 'bold',
   },
-  h3: {
+  H3: {
     fontSize: emToPx('1.17em'),
     marginVertical: emToPx('1em'),
     fontWeight: 'bold',
   },
-  h4: {
+  H4: {
     fontSize: emToPx('1em'),
     marginVertical: emToPx('1.33em'),
     fontWeight: 'bold',
   },
-  h5: {
+  H5: {
     fontSize: emToPx('.83em'),
     marginVertical: emToPx('1.67em'),
     fontWeight: 'bold',
   },
-  h6: {
+  H6: {
     fontSize: emToPx('.67em'),
     marginVertical: emToPx('2.33em'),
     fontWeight: 'bold',
