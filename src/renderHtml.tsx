@@ -90,13 +90,15 @@ export const renderElements = (
   });
 };
 
+export type ElementRenderer = (
+  element: TagElement | string,
+  children?: any,
+  index?: number
+) => ReactElement | string;
+
 export type HtmlRenderOptions = {
   collapse: boolean;
-  renderer: (
-    element: TagElement | string,
-    children?: any,
-    index?: number
-  ) => ReactElement | string;
+  renderer: ElementRenderer;
 };
 
 const defaults: HtmlRenderOptions = {
