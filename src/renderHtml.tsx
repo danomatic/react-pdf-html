@@ -54,6 +54,9 @@ export const renderer = (
     return element;
   }
   const Element = tags[element.tag as TagValue];
+  if (!Element) {
+    throw new Error(`Tag ${element.tag} not yet supported`);
+  }
   return children?.length > 0 ? (
     <Element key={index} {...element}>
       {children}
