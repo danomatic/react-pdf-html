@@ -11,6 +11,7 @@ export type HtmlContent = (HtmlElement | string)[];
 export type HtmlElement = {
   tag: string;
   attributes: Record<string, string>;
+  classNames: string[];
   content: HtmlContent;
   parentTag?: string;
   index?: number;
@@ -45,6 +46,7 @@ export const convertNode = (node: HTMLNode): HtmlElement | string => {
   return {
     tag,
     attributes: html.attributes,
+    classNames: html.classNames.split(/(\s+)/g).filter((value) => value !== ''),
     content,
     parentTag: undefined,
     indexOfKind: 0,

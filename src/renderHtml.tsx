@@ -214,9 +214,9 @@ const renderHtml = (
     renderer: defaultRenderer,
     renderers,
     style: {},
-    stylesheet: createHtmlStylesheet(fontSize, options.stylesheet),
+    stylesheet: {},
   };
-  const opts = { ...defaults, ...options };
+  const opts = { ...defaults, ...options, stylesheet: createHtmlStylesheet(fontSize, options.stylesheet) };
   const parsed = parseHtml(text);
 
   return (
