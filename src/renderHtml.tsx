@@ -216,7 +216,12 @@ const renderHtml = (
     style: {},
     stylesheet: {},
   };
-  const opts = { ...defaults, ...options, stylesheet: createHtmlStylesheet(fontSize, options.stylesheet) };
+  const opts = {
+    ...defaults,
+    ...options,
+    renderers: { ...options.renderers, ...defaults.renderers },
+    stylesheet: createHtmlStylesheet(fontSize, options.stylesheet),
+  };
   const parsed = parseHtml(text);
 
   return (

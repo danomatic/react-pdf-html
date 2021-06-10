@@ -18,7 +18,7 @@ Welcome to your <b>doom!</b>:
       {
         tag: 'B',
         attributes: {},
-        hasBlockContent: false,
+        classNames: [],
         indexOfKind: 0,
         parentTag: undefined,
         content: ['doom!'],
@@ -27,7 +27,7 @@ Welcome to your <b>doom!</b>:
       {
         tag: 'P',
         attributes: {},
-        hasBlockContent: true,
+        classNames: [],
         indexOfKind: 0,
         parentTag: undefined,
         content: [
@@ -35,7 +35,7 @@ Welcome to your <b>doom!</b>:
           {
             tag: 'UL',
             attributes: {},
-            hasBlockContent: true,
+            classNames: [],
             parentTag: 'P',
             index: 1,
             indexOfKind: 0,
@@ -44,7 +44,7 @@ Welcome to your <b>doom!</b>:
               {
                 tag: 'LI',
                 attributes: {},
-                hasBlockContent: true,
+                classNames: [],
                 parentTag: 'UL',
                 index: 1,
                 indexOfKind: 0,
@@ -54,7 +54,7 @@ Welcome to your <b>doom!</b>:
               {
                 tag: 'LI',
                 attributes: {},
-                hasBlockContent: true,
+                classNames: [],
                 parentTag: 'UL',
                 index: 3,
                 indexOfKind: 1,
@@ -65,7 +65,7 @@ Welcome to your <b>doom!</b>:
                     attributes: {
                       href: 'http://google.com',
                     },
-                    hasBlockContent: false,
+                    classNames: [],
                     parentTag: 'LI',
                     index: 1,
                     indexOfKind: 0,
