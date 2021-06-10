@@ -7,7 +7,7 @@ Hopefully the author of `react-pdf` will simply incorpoerate it so that the comm
 ## How it Works
 
 1. Uses `node-html-parser` (see https://github.com/taoqf/node-html-parser) to parse the HTML into a JSON tree.
-2. Converts the tree into a simplified, printable JSON structure (see `TagElement` below)
+2. Converts the tree into a simplified, printable JSON structure (see [`HtmlElement`](https://github.com/danomatic/react-pdf-html/blob/589f4d02dcfefd9279535d6c1db0319f42c845b2/src/parseHtml.ts#L11))
 3. Renders the tree with `renderHtml`, which has a mapping of render functions and styles. This can be overrideen using the `renderer` prop.
 
 ## Usage
