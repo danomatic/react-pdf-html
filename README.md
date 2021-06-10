@@ -13,7 +13,7 @@ Hopefully the author of `react-pdf` will simply incorpoerate it so that the comm
 ## Usage
 
 ```tsx
-import { Html } from 'react-pdf-html'; // this isn't yet available as an NPM package, so you just need to download the files
+import { Html } from 'react-pdf-html'; // not yet available as an NPM package, so just download the files
 
 const html = `<html>
   <body>
