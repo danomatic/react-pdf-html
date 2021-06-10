@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react';
-import renderers, { renderBlock, renderInline } from './renderers';
+import renderers, { renderBlock, renderInline, renderNoop } from './renderers';
 import { Text, View } from '@react-pdf/renderer';
 import parseHtml, { HtmlContent, HtmlElement } from './parseHtml';
 import { createHtmlStylesheet, HtmlStyles } from './styles';
@@ -8,8 +8,6 @@ import { Style } from '@react-pdf/types';
 export type Tag =
   | 'HTML'
   | 'BODY'
-  | 'HEAD'
-  | 'TITLE'
   | 'H1'
   | 'H2'
   | 'H3'
@@ -18,24 +16,38 @@ export type Tag =
   | 'H6'
   | 'DIV'
   | 'P'
+  | 'BLOCKQUOTE'
+  | 'ARTICLE'
+  | 'CAPTION'
+  | 'FORM'
+  | 'HR'
+  | 'BR'
+  | 'ADDRESS'
+  | 'ASIDE'
   | 'B'
   | 'STRONG'
   | 'I'
+  | 'EM'
   | 'U'
   | 'S'
+  | 'CITE'
+  | 'CODE'
+  | 'ABBR'
   | 'A'
+  | 'IMG'
   | 'UL'
   | 'OL'
   | 'LI'
   | 'TABLE'
   | 'TR'
-  | 'TD';
+  | 'TD'
+  | 'TH'
+  | 'THEAD'
+  | 'TBODY';
 
 export const isBlock: Record<Tag, boolean> = {
   HTML: true,
   BODY: true,
-  HEAD: true,
-  TITLE: true,
   H1: true,
   H2: true,
   H3: true,
@@ -45,18 +57,34 @@ export const isBlock: Record<Tag, boolean> = {
 
   DIV: true,
   P: true,
+  BLOCKQUOTE: true,
+  ARTICLE: true,
+  CAPTION: true,
+  FORM: true,
+  HR: true,
+  BR: true,
+  ADDRESS: true,
+  ASIDE: true,
 
   B: false,
   STRONG: false,
   I: false,
+  EM: false,
   U: false,
   S: false,
+  CITE: false,
+  CODE: false,
+  ABBR: false,
 
   A: false,
+  IMG: false,
 
   TABLE: true,
   TR: true,
   TD: true,
+  TH: true,
+  THEAD: true,
+  TBODY: true,
 
   UL: true,
   OL: true,
@@ -133,6 +161,10 @@ export const defaultRenderer: HtmlContentRenderer = (
   }
   let Element: HtmlRenderer | undefined = renderers[element.tag as Tag];
   if (!Element) {
+    if (!((element.tag as Tag) in isBlock)) {
+      // Unknown element, do nothing
+      Element = renderNoop;
+    }
     Element = hasBlockContent(element) ? renderBlock : renderInline;
   }
   return (

@@ -45,6 +45,18 @@ export const createHtmlStylesheet = <T extends HtmlStyles>(
       fontSize: em(1),
       marginVertical: em(1),
     },
+    BLOCKQUOTE: {
+      marginVertical: em(1),
+      marginHorizontal: 30,
+    },
+    HR: {
+      marginVertical: em(0.5),
+      borderBottomWidth: 1,
+      borderBottomColor: '#000',
+    },
+    ADDRESS: {
+      fontStyle: 'italic',
+    },
     B: {
       fontWeight: 'bold',
     },
@@ -52,6 +64,9 @@ export const createHtmlStylesheet = <T extends HtmlStyles>(
       fontWeight: 'bold',
     },
     I: {
+      fontStyle: 'italic',
+    },
+    EM: {
       fontStyle: 'italic',
     },
     S: {

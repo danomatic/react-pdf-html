@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, Text, View } from '@react-pdf/renderer';
+import { Link, Text, View, Image } from '@react-pdf/renderer';
 import { HtmlRenderer, HtmlRenderers, Tag } from './renderHtml';
 import { HtmlStyles } from './styles';
 
@@ -41,8 +41,6 @@ export const renderInline: HtmlRenderer = ({
 );
 
 const renderers: HtmlRenderers = {
-  HEAD: renderNoop,
-  TITLE: renderNoop,
   LI: ({ element, stylesheet, children }) => {
     const ordered = element.parentTag === 'OL';
     return (
@@ -64,12 +62,12 @@ const renderers: HtmlRenderers = {
     );
   },
   A: ({ stylesheet, element, children }) => (
-    <Link
-      style={stylesheet.U}
-      src={element.attributes.href ?? (element.content[0] as string)}
-    >
-      {element.content[0] as string}
+    <Link style={stylesheet.U} src={element.attributes.href}>
+      {children}
     </Link>
+  ),
+  IMG: ({ stylesheet, element }) => (
+    <Image style={stylesheet.IMAGE} src={element.attributes.src} />
   ),
 };
 
