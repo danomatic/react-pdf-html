@@ -28,6 +28,10 @@ const html = `<html>
       <s>strikethrough</s>,
       <strong><u><s><i>and all of the above</i></s></u></strong>
     </p>
+    <p>
+      Paragraph with image <img src="${myImageFile}" /> and <a href="http://google.com/">link</a>
+    </p>
+    <hr />
     <ul>
       <li>Unordered item</li>
       <li>Unordered item</li>
@@ -37,10 +41,15 @@ const html = `<html>
       <li>Ordered item</li>
     </ol>
   </body>
-</html>
-`;
+</html>`;
 
-return <Html>{html}</Html>;
+return (
+  <Document>
+    <Page>
+      <Html>{html}</Html>
+    </Page>
+  </Document>
+);
 ```
 
 ## Props
@@ -67,11 +76,19 @@ const stylesheet = {
   },
 };
 
-return <Html stylesheet={stylesheet}>{html}</Html>;
+return (
+  <Document stylesheet={stylesheet}>
+    <Page>
+      <Html>{html}</Html>
+    </Page>
+  </Document>
+);
 ```
 
 ## Font Sizes
+
 The default styesheet roughly matches browser defaults, using a rough emulation of ems:
+
 ```tsx
 const em = (em: number, relativeSize: number = fontSize) => em * relativeSize;
 
@@ -86,8 +103,15 @@ StyleSheet.create({
 ```
 
 By default, the basis for the font size ems is based on `props.style.fontSize`:
+
 ```tsx
-return <Html style={{ fontSize: 10 }}>{html}</Html>
+return (
+  <Document style={{ fontSize: 10 }}>
+    <Page>
+      <Html>{html}</Html>
+    </Page>
+  </Document>
+);
 ```
 
 If this is not defined, it falls back to a default of `18`
