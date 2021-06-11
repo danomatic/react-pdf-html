@@ -182,7 +182,8 @@ const collapseWhitespace = (string: any): string =>
 
 export const renderElements = (
   elements: HtmlContent,
-  options: HtmlRenderOptions
+  options: HtmlRenderOptions,
+  parentIsBlock?: boolean
 ): ReactElement[] => {
   const buckets = bucketElements(elements);
   return buckets.map((bucket, bucketIndex) => {
@@ -197,11 +198,15 @@ export const renderElements = (
         options.renderers,
         isString
           ? undefined
-          : renderElements((element as HtmlElement).content, options),
+          : renderElements(
+          (element as HtmlElement).content,
+          options,
+          isBlock[(element as HtmlElement).tag as Tag]
+          ),
         index
       );
     });
-    return bucket.hasBlock ? (
+    return bucket.hasBlock || parentIsBlock === false ? (
       <React.Fragment key={bucketIndex}>{rendered}</React.Fragment>
     ) : (
       <Text key={bucketIndex}>{rendered}</Text>
