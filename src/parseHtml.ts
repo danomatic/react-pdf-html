@@ -5,11 +5,12 @@ import {
   parse,
   TextNode,
 } from 'node-html-parser';
+import { Tag } from './tags';
 
 export type HtmlContent = (HtmlElement | string)[];
 
 export type HtmlElement = {
-  tag: string;
+  tag: Tag | string;
   attributes: Record<string, string>;
   classNames: string[];
   content: HtmlContent;

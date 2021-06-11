@@ -4,94 +4,7 @@ import { Text, View } from '@react-pdf/renderer';
 import parseHtml, { HtmlContent, HtmlElement } from './parseHtml';
 import { createHtmlStylesheet, HtmlStyles } from './styles';
 import { Style } from '@react-pdf/types';
-
-export type Tag =
-  | 'HTML'
-  | 'BODY'
-  | 'H1'
-  | 'H2'
-  | 'H3'
-  | 'H4'
-  | 'H5'
-  | 'H6'
-  | 'DIV'
-  | 'P'
-  | 'BLOCKQUOTE'
-  | 'ARTICLE'
-  | 'CAPTION'
-  | 'FORM'
-  | 'HR'
-  | 'BR'
-  | 'ADDRESS'
-  | 'ASIDE'
-  | 'PRE'
-  | 'B'
-  | 'STRONG'
-  | 'I'
-  | 'EM'
-  | 'U'
-  | 'S'
-  | 'CITE'
-  | 'CODE'
-  | 'ABBR'
-  | 'A'
-  | 'IMG'
-  | 'UL'
-  | 'OL'
-  | 'LI'
-  | 'TABLE'
-  | 'TR'
-  | 'TD'
-  | 'TH'
-  | 'THEAD'
-  | 'TBODY';
-
-export const isBlock: Record<Tag, boolean> = {
-  HTML: true,
-  BODY: true,
-  H1: true,
-  H2: true,
-  H3: true,
-  H4: true,
-  H5: true,
-  H6: true,
-
-  DIV: true,
-  P: true,
-  BLOCKQUOTE: true,
-  ARTICLE: true,
-  CAPTION: true,
-  FORM: true,
-  HR: true,
-  BR: true,
-  ADDRESS: true,
-  ASIDE: true,
-  PRE: true,
-
-  B: false,
-  STRONG: false,
-  I: false,
-  EM: false,
-  U: false,
-  S: false,
-  CITE: false,
-  CODE: false,
-  ABBR: false,
-
-  A: false,
-  IMG: false,
-
-  TABLE: true,
-  TR: true,
-  TD: true,
-  TH: true,
-  THEAD: true,
-  TBODY: true,
-
-  UL: true,
-  OL: true,
-  LI: true,
-};
+import { isBlock, Tag } from './tags';
 
 type ContentBucket = {
   hasBlock: boolean;
@@ -102,7 +15,7 @@ export const hasBlockContent = (element: HtmlElement | string): boolean => {
   if (typeof element === 'string') {
     return false;
   }
-  if (isBlock[element.tag as Tag]) {
+  if (isBlock[element.tag]) {
     return true;
   }
   if (element.content) {
@@ -117,20 +30,33 @@ const rtrim = (text: string): string => text.replace(/\s+$/, '');
 /**
  * Groups all blocka and non-block elements into buckets so that all non-block elements can be rendered in a parent Text element
  * @param elements Elements to place in buckets of block and non-block content
+ * @param parentTag
  */
-export const bucketElements = (elements: HtmlContent): ContentBucket[] => {
+export const bucketElements = (
+  elements: HtmlContent,
+  parentTag?: Tag | string
+): ContentBucket[] => {
   let bucket: ContentBucket;
   let hasBlock: boolean;
   const buckets: ContentBucket[] = [];
   elements.forEach((element, index) => {
     // clear empty strings between block elements
     if (typeof element === 'string') {
-      if (hasBlock || hasBlock === undefined) {
-        element = ltrim(element);
-      }
-      const next = elements[index + 1];
-      if (next && hasBlockContent(next)) {
-        element = rtrim(element);
+      if (parentTag === 'PRE') {
+        if (element[0] === '\n') {
+          element = element.substr(1);
+        }
+        if (element[element.length - 1] === '\n') {
+          element = element.substr(0, element.length - 1);
+        }
+      } else {
+        if (hasBlock || hasBlock === undefined) {
+          element = ltrim(element);
+        }
+        const next = elements[index + 1];
+        if (next && hasBlockContent(next)) {
+          element = rtrim(element);
+        }
       }
       if (element === '') {
         return;
@@ -151,6 +77,11 @@ export const bucketElements = (elements: HtmlContent): ContentBucket[] => {
   return buckets;
 };
 
+export const getClassStyles = (classNames: string[], stylesheet: HtmlStyles) =>
+  classNames
+    .filter((className) => className in stylesheet)
+    .map((className) => stylesheet[className]);
+
 export const defaultRenderer: HtmlContentRenderer = (
   element: HtmlElement | string,
   stylesheet: HtmlStyles,
@@ -161,17 +92,22 @@ export const defaultRenderer: HtmlContentRenderer = (
   if (typeof element === 'string') {
     return element;
   }
-  let Element: HtmlRenderer | undefined = renderers[element.tag as Tag];
+  let Element: HtmlRenderer | undefined = renderers[element.tag];
   if (!Element) {
-    if (!((element.tag as Tag) in isBlock)) {
+    if (!(element.tag in isBlock)) {
       // Unknown element, do nothing
       Element = renderNoop;
     }
     Element = hasBlockContent(element) ? renderBlock : renderInline;
   }
+  const style = [
+    stylesheet[element.tag],
+    ...getClassStyles(element.classNames, stylesheet),
+  ];
   return (
     <Element
       key={index}
+      style={style}
       children={children}
       element={element}
       stylesheet={stylesheet}
@@ -185,30 +121,37 @@ const collapseWhitespace = (string: any): string =>
 export const renderElements = (
   elements: HtmlContent,
   options: HtmlRenderOptions,
-  parentIsBlock?: boolean
+  parentTag?: Tag | string
 ): ReactElement[] => {
-  const buckets = bucketElements(elements);
+  const buckets = bucketElements(elements, parentTag);
   return buckets.map((bucket, bucketIndex) => {
     const rendered = bucket.content.map((element, index) => {
-      const isString = typeof element === 'string';
-      if (isString && options.collapse) {
-        element = collapseWhitespace(element);
+      if (typeof element === 'string') {
+        if (options.collapse) {
+          element = collapseWhitespace(element);
+        }
+        return options.renderer(
+          element,
+          options.stylesheet,
+          options.renderers,
+          undefined,
+          index
+        );
       }
       return options.renderer(
         element,
         options.stylesheet,
         options.renderers,
-        isString
-          ? undefined
-          : renderElements(
-              (element as HtmlElement).content,
-              options,
-              isBlock[(element as HtmlElement).tag as Tag]
-            ),
+        renderElements(
+          element.content,
+          element.tag === 'PRE' ? { ...options, collapse: false } : options,
+          element.tag
+        ),
         index
       );
     });
-    return bucket.hasBlock || parentIsBlock === false ? (
+    const parentIsBlock = parentTag && isBlock[parentTag] === false;
+    return bucket.hasBlock || parentIsBlock ? (
       <React.Fragment key={bucketIndex}>{rendered}</React.Fragment>
     ) : (
       <Text key={bucketIndex}>{rendered}</Text>
@@ -218,10 +161,11 @@ export const renderElements = (
 
 export type HtmlRenderer = React.FC<{
   element: HtmlElement;
+  style: Style[];
   stylesheet: HtmlStyles;
 }>;
 
-export type HtmlRenderers = Partial<Record<Tag, HtmlRenderer>>;
+export type HtmlRenderers = Record<Tag | string, HtmlRenderer>;
 
 export type HtmlContentRenderer = (
   element: HtmlElement | string,
@@ -255,13 +199,17 @@ const renderHtml = (
     renderers,
     style: {},
     stylesheet: {},
-    resetStyles: false
+    resetStyles: false,
   };
   const opts = {
     ...defaults,
     ...options,
     renderers: { ...options.renderers, ...defaults.renderers },
-    stylesheet: createHtmlStylesheet(fontSize, options.resetStyles, options.stylesheet),
+    stylesheet: createHtmlStylesheet(
+      fontSize,
+      options.resetStyles,
+      options.stylesheet
+    ),
   };
   const parsed = parseHtml(text);
 

@@ -1,8 +1,8 @@
 import { StyleSheet } from '@react-pdf/renderer';
 import { Style } from '@react-pdf/types';
-import { Tag } from './renderHtml';
+import { Tag } from './tags';
 
-export type HtmlStyles = Record<string, Style> & Partial<Record<Tag, Style>>;
+export type HtmlStyles = Record<Tag | string, Style>;
 
 export const createHtmlStylesheet = <T extends HtmlStyles>(
   fontSize: number,
@@ -14,6 +14,7 @@ export const createHtmlStylesheet = <T extends HtmlStyles>(
   let base: HtmlStyles = {
     BODY: {
       margin: 8,
+      fontFamily: 'Times-Roman',
     },
     H1: {
       fontSize: em(2),
@@ -114,11 +115,11 @@ export const createHtmlStylesheet = <T extends HtmlStyles>(
     TABLE: {
       display: 'flex',
       flexDirection: 'column',
-      borderColor: 'gray',
-      borderWidth: 1,
+      // borderColor: 'gray',
+      // borderWidth: 1,
       flexShrink: 1,
-      // borderCollapse: 'collapse',
-      borderSpacing: 2,
+      borderCollapse: 'collapse',
+      // borderSpacing: 2,
     } as any,
     THEAD: {
       display: 'flex',
