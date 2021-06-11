@@ -89,6 +89,11 @@ const renderers: HtmlRenderers = {
 
     return <View style={[...style, overrides]}>{children}</View>;
   },
+  TR: ({ style, children }) => (
+    <View wrap={false} style={style}>
+      {children}
+    </View>
+  ),
   TD: renderCell,
   TH: renderCell,
 };
