@@ -24,6 +24,7 @@ export type Tag =
   | 'BR'
   | 'ADDRESS'
   | 'ASIDE'
+  | 'PRE'
   | 'B'
   | 'STRONG'
   | 'I'
@@ -65,6 +66,7 @@ export const isBlock: Record<Tag, boolean> = {
   BR: true,
   ADDRESS: true,
   ASIDE: true,
+  PRE: true,
 
   B: false,
   STRONG: false,
@@ -199,10 +201,10 @@ export const renderElements = (
         isString
           ? undefined
           : renderElements(
-          (element as HtmlElement).content,
-          options,
-          isBlock[(element as HtmlElement).tag as Tag]
-          ),
+              (element as HtmlElement).content,
+              options,
+              isBlock[(element as HtmlElement).tag as Tag]
+            ),
         index
       );
     });
@@ -235,6 +237,7 @@ export type HtmlRenderOptions = {
   renderers: HtmlRenderers;
   style: Style;
   stylesheet: HtmlStyles;
+  resetStyles: boolean;
 };
 
 const renderHtml = (
@@ -252,12 +255,13 @@ const renderHtml = (
     renderers,
     style: {},
     stylesheet: {},
+    resetStyles: false
   };
   const opts = {
     ...defaults,
     ...options,
     renderers: { ...options.renderers, ...defaults.renderers },
-    stylesheet: createHtmlStylesheet(fontSize, options.stylesheet),
+    stylesheet: createHtmlStylesheet(fontSize, options.resetStyles, options.stylesheet),
   };
   const parsed = parseHtml(text);
 

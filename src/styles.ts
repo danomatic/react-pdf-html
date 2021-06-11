@@ -6,11 +6,15 @@ export type HtmlStyles = Record<string, Style> & Partial<Record<Tag, Style>>;
 
 export const createHtmlStylesheet = <T extends HtmlStyles>(
   fontSize: number,
+  reset: boolean = false,
   overrides?: T
 ): HtmlStyles => {
   const em = (em: number, relativeSize: number = fontSize) => em * relativeSize;
 
-  return StyleSheet.create({
+  let base: HtmlStyles = {
+    BODY: {
+      margin: 8,
+    },
     H1: {
       fontSize: em(2),
       marginVertical: em(0.67, em(2)),
@@ -57,6 +61,11 @@ export const createHtmlStylesheet = <T extends HtmlStyles>(
     ADDRESS: {
       fontStyle: 'italic',
     },
+    PRE: {
+      // fontFamily: 'monospace',
+      // whiteSpace: 'pre',
+      marginVertical: em(1),
+    },
     B: {
       fontWeight: 'bold',
     },
@@ -73,6 +82,12 @@ export const createHtmlStylesheet = <T extends HtmlStyles>(
       textDecoration: 'line-through',
     },
     U: {
+      textDecoration: 'underline',
+    },
+    CODE: {
+      // fontFamily: 'monospace',
+    },
+    A: {
       textDecoration: 'underline',
     },
     UL: {
@@ -96,6 +111,64 @@ export const createHtmlStylesheet = <T extends HtmlStyles>(
       textAlign: 'left',
       flexGrow: 1,
     },
-    ...overrides,
-  });
+    TABLE: {
+      display: 'flex',
+      flexDirection: 'column',
+      borderColor: 'gray',
+      borderWidth: 1,
+      flexShrink: 1,
+      // borderCollapse: 'collapse',
+      borderSpacing: 2,
+    } as any,
+    THEAD: {
+      display: 'flex',
+      flexDirection: 'column',
+    },
+    TBODY: {
+      display: 'flex',
+      flexDirection: 'column',
+    },
+    TR: {
+      display: 'flex',
+      flexDirection: 'row',
+      flexShrink: 1,
+    },
+    TD: {
+      flexGrow: 1,
+      flexShrink: 1,
+      flexBasis: 1,
+    },
+    TH: {
+      flexGrow: 1,
+      flexShrink: 1,
+      flexBasis: 1,
+      fontWeight: 'bold',
+    },
+  };
+
+  if (reset) {
+    for (const key of Object.keys(base)) {
+      for (const style of Object.keys(base[key])) {
+        if (
+          style.startsWith('margin') ||
+          style.startsWith('padding') ||
+          style === 'fontSize'
+        ) {
+          delete (base as any)[key][style];
+        }
+      }
+    }
+    base.LI_bullet.display = 'none';
+    (base.TABLE as any).borderCollapse = 'collapse';
+    (base.TABLE as any).borderSpacing = 0;
+  }
+
+  if (overrides) {
+    for (const key of Object.keys(overrides)) {
+      // TODO: use StyleSheet.flatten, but it appears to be broken...
+      base[key] = { ...base[key], ...overrides[key] };
+    }
+  }
+
+  return StyleSheet.create(base);
 };

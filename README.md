@@ -16,31 +16,66 @@ Hopefully the author of `react-pdf` will simply incorpoerate it so that the comm
 import { Html } from 'react-pdf-html'; // not yet available as an NPM package, so just download the files
 
 const html = `<html>
-  <body>
-    <h1>Heading 1</h1>
-    <h2 class="special">Heading 2</h2>
-    <h3>Heading 3</h3>
-    <h4>Heading 4</h4>
-    <h5>Heading 5</h5>
-    <h6>Heading 6</h6>
-    <p>
-      Paragraph with <strong>bold</strong>, <i>italic</i>, <u>underline</u>,
-      <s>strikethrough</s>,
-      <strong><u><s><i>and all of the above</i></s></u></strong>
-    </p>
-    <p>
-      Paragraph with image <img src="${myImageFile}" /> and <a href="http://google.com/">link</a>
-    </p>
-    <hr />
-    <ul>
-      <li>Unordered item</li>
-      <li>Unordered item</li>
-    </ul>
-    <ol>
-      <li>Ordered item</li>
-      <li>Ordered item</li>
-    </ol>
-  </body>
+<body>
+  <h1>Heading 1</h1>
+  <h2 class="special">Heading 2</h2>
+  <h3>Heading 3</h3>
+  <h4>Heading 4</h4>
+  <h5>Heading 5</h5>
+  <h6>Heading 6</h6>
+  <p>
+    Paragraph with <strong>bold</strong>, <i>italic</i>, <u>underline</u>,
+    <s>strikethrough</s>,
+    <strong
+      ><u
+        ><s><i>and all of the above</i></s></u
+      ></strong
+    >
+  </p>
+  <p>
+    Paragraph with image <img src="${myFile}" /> and
+    <a href="http://google.com">link</a>
+  </p>
+  <hr />
+  <ul>
+    <li>Unordered item</li>
+    <li>Unordered item</li>
+  </ul>
+  <ol>
+    <li>Ordered item</li>
+    <li>Ordered item</li>
+  </ol>
+  Text outside of any tags
+  <table>
+    <thead>
+      <tr>
+        <th>Column 1</th>
+        <th>Column 2</th>
+        <th>Column 3</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Foo</td>
+        <td>Bar</td>
+        <td>Foobar</td>
+      </tr>
+      <tr>
+        <td colspan="2">Foo</td>
+        <td>Bar</td>
+      </tr>
+      <tr>
+        <td>Some longer thing</td>
+        <td>Even more content than before!</td>
+        <td>Even more content than before!</td>
+      </tr>
+    </tbody>
+  </table>
+  <pre>
+    const foo = 'bar';
+  </pre>
+  <code>const foo = 'bar';</code>
+</body>
 </html>`;
 
 return (
@@ -61,6 +96,7 @@ type HtmlProps = {
   renderers: HtmlRenderers; // Mapping of { TAGNAME: renderComponent }
   style: Style; // Html root View style
   stylesheet: HtmlStyles; // Mapping of { TAGNAME: Style, className: Style }
+  resetStyles: false // If true, style/CSS reset
 };
 ```
 
@@ -77,9 +113,23 @@ const stylesheet = {
 };
 
 return (
-  <Document stylesheet={stylesheet}>
+  <Document>
     <Page>
-      <Html>{html}</Html>
+      <Html stylesheet={stylesheet}>{html}</Html>
+    </Page>
+  </Document>
+);
+```
+
+## Resetting Styles
+
+Reset styles (similar to [CSS reset](https://meyerweb.com/eric/tools/css/reset/))
+
+```tsx
+return (
+  <Document>
+    <Page>
+      <Html resetStyles>{html}</Html>
     </Page>
   </Document>
 );
@@ -106,9 +156,9 @@ By default, the basis for the font size ems is based on `props.style.fontSize`:
 
 ```tsx
 return (
-  <Document style={{ fontSize: 10 }}>
+  <Document>
     <Page>
-      <Html>{html}</Html>
+      <Html style={{ fontSize: 10 }}>{html}</Html>
     </Page>
   </Document>
 );
