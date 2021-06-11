@@ -94,6 +94,11 @@ const renderers: HtmlRenderers = {
       {children}
     </View>
   ),
+  BR: ({ style }) => (
+    <View wrap={false} style={style}>
+      <Text> </Text>
+    </View>
+  ),
   TD: renderCell,
   TH: renderCell,
 };

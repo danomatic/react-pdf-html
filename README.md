@@ -1,8 +1,8 @@
-# react-pdf-html
+# react-pdf Html Component
 
-Render HTML in react-pdf. It's never going to do everything a browser does, but it's inteded to be extensible.
+Render HTML in [react-pdf](https://github.com/diegomura/react-pdf/). It's never going to do everything a browser does, but it's inteded to be extensible.
 
-Hopefully the author of `react-pdf` will simply incorpoerate it so that the community can continue to extend it.
+Hopefully the author of `react-pdf` will simply integrate it so that the community can continue to extend it.
 
 ## How it Works
 
@@ -123,7 +123,7 @@ return (
 );
 ```
 
-### Inline
+### Inline Styles
 
 ```tsx
 const html = `<div style="width: 200px; height: 200px; background-color: pink">Foobar</div>`;
