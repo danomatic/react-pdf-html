@@ -96,11 +96,13 @@ type HtmlProps = {
   renderers: HtmlRenderers; // Mapping of { TAGNAME: renderComponent }
   style: Style; // Html root View style
   stylesheet: HtmlStyles; // Mapping of { TAGNAME: Style, className: Style }
-  resetStyles: false // If true, style/CSS reset
+  resetStyles: false; // If true, style/CSS reset
 };
 ```
 
 ## Overriding Element Styles
+
+### Provide a Stylesheet
 
 ```tsx
 const stylesheet = {
@@ -116,6 +118,20 @@ return (
   <Document>
     <Page>
       <Html stylesheet={stylesheet}>{html}</Html>
+    </Page>
+  </Document>
+);
+```
+
+### Inline
+
+```tsx
+const html = `<div style="width: 200px; height: 200px; background-color: pink">Foobar</div>`;
+
+return (
+  <Document>
+    <Page>
+      <Html>{html}</Html>
     </Page>
   </Document>
 );

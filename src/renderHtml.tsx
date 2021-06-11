@@ -103,6 +103,7 @@ export const defaultRenderer: HtmlContentRenderer = (
   const style = [
     stylesheet[element.tag],
     ...getClassStyles(element.classNames, stylesheet),
+    element.style || {},
   ];
   return (
     <Element

@@ -13,10 +13,13 @@
   "license": "MIT",
   "dependencies": {
     "@react-pdf/renderer": "^2.0.12",
+    "camelize": "^1.0.0",
+    "css": "^3.0.0",
     "node-html-parser": "^3.3.5",
     "react": "^17.0.2"
   },
   "devDependencies": {
+    "@types/css": "0.0.31",
     "@types/jest": "^25.2.3",
     "@types/node": "^14.0.25",
     "@types/react": "^17.0.5",
