@@ -11,10 +11,10 @@ export const getClassStyles = (classNames: string[], stylesheet: HtmlStyles) =>
     .map((className) => stylesheet[className]);
 
 export const renderBlock: HtmlRenderer = ({
-  element,
-  stylesheet,
-  children,
-}) => (
+                                            element,
+                                            stylesheet,
+                                            children,
+                                          }) => (
   <View
     style={[
       (stylesheet as any)[element.tag],
@@ -26,10 +26,10 @@ export const renderBlock: HtmlRenderer = ({
 );
 
 export const renderInline: HtmlRenderer = ({
-  element,
-  stylesheet,
-  children,
-}) => (
+                                             element,
+                                             stylesheet,
+                                             children,
+                                           }) => (
   <Text
     style={[
       (stylesheet as any)[element.tag],
@@ -62,12 +62,24 @@ const renderers: HtmlRenderers = {
     );
   },
   A: ({ stylesheet, element, children }) => (
-    <Link style={stylesheet.U} src={element.attributes.href}>
+    <Link
+      style={[
+        (stylesheet as any)[element.tag],
+        ...getClassStyles(element.classNames, stylesheet),
+      ]}
+      src={element.attributes.href}
+    >
       {children}
     </Link>
   ),
   IMG: ({ stylesheet, element }) => (
-    <Image style={stylesheet.IMAGE} src={element.attributes.src} />
+    <Image
+      style={[
+        (stylesheet as any)[element.tag],
+        ...getClassStyles(element.classNames, stylesheet),
+      ]}
+      src={element.attributes.src}
+    />
   ),
 };
 
