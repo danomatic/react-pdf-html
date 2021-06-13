@@ -1,17 +1,21 @@
-# react-pdf Html Component
+# react-pdf-html
 
-Render HTML in [react-pdf](https://github.com/diegomura/react-pdf/)
+`<Html>` component for [react-pdf](https://github.com/diegomura/react-pdf/)
 
-- Support for CSS using in-document `<style>` tags and element `style` attributes (but only style properties supported by `react-pdf`)
-- Browser style defaults with option for style reset
-- Basic `<ul>`, `<ol>` and `<table>`(attempted using flex) support
+- Support for CSS using in-document `<style>` tags and element `style` attributes (limited to `Style` properties supported by `react-pdf`)
+- [Browser CSS defaults](https://www.w3schools.com/cssref/css_default_values.asp) with option for [style reset](https://meyerweb.com/eric/tools/css/reset/)
+- Basic `<table>`(attempted using flex layouts) `<ul>` and `<ol>` support
 - Ability to provide custom renderers for any tag
 
 ## How it Works
 
-1. Uses [node-html-parser](https://github.com/taoqf/node-html-parser) to parse the HTML into a JSON tree.
-2. Parses any `<style>` tags in the document and `style` attributes
-3. Renders the tree, applying all the styles and has a mapping of render functions. These can be overridden on a per tag basis using the `renderers` prop.
+1. Parses the HTML string into a JSON tree of nodes using [node-html-parser](https://github.com/taoqf/node-html-parser)
+2. Parses any `<style>` tags in the document and `style` attributes using [css](https://github.com/reworkcss/css)
+3. Renders all nodes using the appropriate `react-pdf` components, applying cascading styles for each node as an array passed to the `style` prop:
+    - block/container nodes using `<View>`
+    - text nodes using `<Text>`, with appropriate nesting and collapsing of whitepace
+    - `<img>` nodes using `<Image>`
+    - `<a>` nodes using `<Link>`
 
 ## Usage
 
@@ -30,8 +34,6 @@ const html = `<html>
     <h2 style="background-color: pink">Heading 2</h2>
     <h3>Heading 3</h3>
     <h4 class="my-heading4">Heading 4</h4>
-    <h5>Heading 5</h5>
-    <h6>Heading 6</h6>
     <p>
       Paragraph with <strong>bold</strong>, <i>italic</i>, <u>underline</u>,
       <s>strikethrough</s>,
@@ -80,8 +82,8 @@ const html = `<html>
     <div style="width: 200px; height: 200px; background: pink"></div>
     <pre>
     const foo = 'bar';
+    const bar = 'foo';
     </pre>
-    <code>const foo = 'bar';</code>
   </body>
 </html>
 `;
@@ -149,7 +151,7 @@ return (
 
 ## Resetting Styles
 
-Reset styles (similar to [CSS reset](https://meyerweb.com/eric/tools/css/reset/))
+Reset browser default styles (see [CSS reset](https://meyerweb.com/eric/tools/css/reset/))
 
 ```tsx
 return (
