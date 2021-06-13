@@ -13,10 +13,16 @@ export type HtmlProps = {
 };
 
 const Html: React.FC<HtmlProps> = (props) => {
-  return useMemo(
-    () => <>{renderHtml(props.children, props)}</>,
-    Object.values(props)
-  );
+  return useMemo(() => <>{renderHtml(props.children, props)}</>, [
+    props.collapse,
+    ...Object.values(props.renderers || {}),
+    ...(Array.isArray(props.style) ? props.style : [props.style]),
+    ...(Array.isArray(props.stylesheet)
+      ? props.stylesheet
+      : [props.stylesheet]),
+    props.resetStyles,
+    props.children,
+  ]);
 };
 
 export default Html;
