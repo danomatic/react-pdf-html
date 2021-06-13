@@ -38,7 +38,7 @@ export const renderCell: HtmlRenderer = ({ style, element, children }) => {
   } else {
     baseStyles.borderRightWidth = 0;
     baseStyles.borderBottomWidth = 0;
-    if (element.indexOfKind !== 0) {
+    if (element.indexOfType !== 0) {
       baseStyles.borderLeftWidth = tableStyles.borderWidth;
       baseStyles.borderTopWidth = tableStyles.borderWidth;
     }
@@ -65,7 +65,7 @@ const renderers: HtmlRenderers = {
     return (
       <View style={style}>
         <View style={bulletStyles}>
-          <Text>{ordered ? element.indexOfKind + 1 + '.' : '•'}</Text>
+          <Text>{ordered ? element.indexOfType + 1 + '.' : '•'}</Text>
         </View>
         <Text style={contentStyles}>{children}</Text>
       </View>

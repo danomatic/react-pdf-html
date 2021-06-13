@@ -118,6 +118,7 @@ export const renderElement = (
       Element = hasBlockContent(element) ? renderBlock : renderInline;
     }
   }
+
   return (
     <Element
       key={index}
@@ -181,7 +182,7 @@ export const applyStylesheets = (
     for (const selector of Object.keys(stylesheet)) {
       const elements = rootElement.querySelectorAll(selector) as HtmlElement[];
       elements.forEach((element) => {
-        element.style.unshift(stylesheet[selector]);
+        element.style.push(stylesheet[selector]);
       });
     }
   });

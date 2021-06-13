@@ -19,7 +19,7 @@ Welcome to your <b>doom!</b>:
         tag: 'B',
         attributes: {},
         classNames: [],
-        indexOfKind: 0,
+        indexOfType: 0,
         parentTag: undefined,
         content: ['doom!'],
       },
@@ -28,7 +28,7 @@ Welcome to your <b>doom!</b>:
         tag: 'P',
         attributes: {},
         classNames: [],
-        indexOfKind: 0,
+        indexOfType: 0,
         parentTag: undefined,
         content: [
           '\n    ',
@@ -38,7 +38,7 @@ Welcome to your <b>doom!</b>:
             classNames: [],
             parentTag: 'P',
             index: 1,
-            indexOfKind: 0,
+            indexOfType: 0,
             content: [
               '\n        ',
               {
@@ -47,7 +47,7 @@ Welcome to your <b>doom!</b>:
                 classNames: [],
                 parentTag: 'UL',
                 index: 1,
-                indexOfKind: 0,
+                indexOfType: 0,
                 content: ['First item'],
               },
               '\n        ',
@@ -57,7 +57,7 @@ Welcome to your <b>doom!</b>:
                 classNames: [],
                 parentTag: 'UL',
                 index: 3,
-                indexOfKind: 1,
+                indexOfType: 1,
                 content: [
                   'Second item: ',
                   {
@@ -68,7 +68,7 @@ Welcome to your <b>doom!</b>:
                     classNames: [],
                     parentTag: 'LI',
                     index: 1,
-                    indexOfKind: 0,
+                    indexOfType: 0,
                     content: ['google.com'],
                   },
                 ],

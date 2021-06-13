@@ -19,7 +19,7 @@ export type HtmlElement = HTMLElement & {
   parentNode: HtmlElement;
   style: Style[];
   content: HtmlContent;
-  indexOfKind: number;
+  indexOfType: number;
   querySelectorAll: (selector: string) => HtmlElement[];
   querySelector: (selector: string) => HtmlElement;
 };
@@ -107,7 +107,7 @@ export const convertNode = (node: HTMLNode): HtmlElement | string => {
   const kindCounters: Record<string, number> = {};
   content.forEach((child) => {
     if (typeof child !== 'string') {
-      child.indexOfKind =
+      child.indexOfType =
         child.tag in kindCounters
           ? (kindCounters[child.tag] = kindCounters[child.tag] + 1)
           : (kindCounters[child.tag] = 0);
@@ -123,7 +123,7 @@ export const convertNode = (node: HTMLNode): HtmlElement | string => {
     tag: (html.tagName || '').toLowerCase() as Tag | string,
     style: style ? [style] : [],
     content,
-    indexOfKind: 0,
+    indexOfType: 0,
   }) as HtmlElement;
 };
 
