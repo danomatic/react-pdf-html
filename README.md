@@ -102,11 +102,11 @@ return (
 ```ts
 type HtmlProps = {
   children: string; // the HTML
-  collapse: boolean; // Default: true. Collapse whitespace. If false, render newlines as breaks
-  renderers: HtmlRenderers; // Mapping of { tagName: HtmlRenderer }
-  style: Style | Style[]; // Html root View style
-  stylesheet: HtmlStyles | HtmlStyles[]; // Mapping of { selector: Style }
-  resetStyles: false; // If true, style/CSS reset
+  collapse?: boolean; // Default: true. Collapse whitespace. If false, render newlines as breaks
+  renderers?: HtmlRenderers; // Mapping of { tagName: HtmlRenderer }
+  style?: Style | Style[]; // Html root View style
+  stylesheet?: HtmlStyles | HtmlStyles[]; // Mapping of { selector: Style }
+  resetStyles?: false; // If true, style/CSS reset
 };
 ```
 
