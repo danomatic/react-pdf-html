@@ -3,15 +3,13 @@
 Render HTML in [react-pdf](https://github.com/diegomura/react-pdf/)
 
 - Support for CSS using in-document `<style>` tags and element `style` attributes (but only style properties supported by `react-pdf`)
-- Approximate port of browser style defaults with option to reset
-- Basic list and table support (to the extent that flex box allows)
-- Ability to provide custom renderers for any tag name
-
-Hopefully the author of `react-pdf` will simply integrate it so that the community can continue to extend it.
+- Browser style defaults with option for style reset
+- Basic `<ul>`, `<ol>` and `<table>`(attempted using flex) support
+- Ability to provide custom renderers for any tag
 
 ## How it Works
 
-1. Uses `node-html-parser` (see https://github.com/taoqf/node-html-parser) to parse the HTML into a JSON tree.
+1. Uses [node-html-parser](https://github.com/taoqf/node-html-parser) to parse the HTML into a JSON tree.
 2. Parses any `<style>` tags in the document and `style` attributes
 3. Renders the tree, applying all the styles and has a mapping of render functions. These can be overridden on a per tag basis using the `renderers` prop.
 
