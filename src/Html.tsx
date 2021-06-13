@@ -1,7 +1,14 @@
 import React, { useMemo } from 'react';
-import renderHtml, { HtmlRenderOptions } from './renderHtml';
+import renderHtml, { HtmlRenderers } from './renderHtml';
+import { Style } from '@react-pdf/types';
+import { HtmlStyles } from './styles';
 
-export type HtmlProps = Partial<HtmlRenderOptions> & {
+export type HtmlProps = {
+  collapse?: boolean;
+  renderers?: HtmlRenderers;
+  style?: Style | (Style | undefined)[];
+  stylesheet?: HtmlStyles | HtmlStyles[];
+  resetStyles?: boolean;
   children: string;
 };
 

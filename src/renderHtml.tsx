@@ -6,6 +6,21 @@ import { createHtmlStylesheet, HtmlStyles } from './styles';
 import { Style } from '@react-pdf/types';
 import { isBlock, Tag } from './tags';
 
+export type HtmlRenderer = React.FC<{
+  element: HtmlElement;
+  style: Style[];
+  stylesheets: HtmlStyles[];
+}>;
+
+export type HtmlRenderers = Record<Tag | string, HtmlRenderer>;
+
+export type HtmlRenderOptions = {
+  collapse: boolean;
+  renderers: HtmlRenderers;
+  stylesheets: HtmlStyles[];
+  resetStyles: boolean;
+};
+
 type ContentBucket = {
   hasBlock: boolean;
   content: HtmlContent;
@@ -83,7 +98,7 @@ export const getClassStyles = (classNames: string, stylesheet: HtmlStyles) =>
     .filter((className) => className !== '' && className in stylesheet)
     .map((className) => stylesheet[className]);
 
-export const defaultRenderer: HtmlContentRenderer = (
+export const renderElement = (
   element: HtmlElement | string,
   stylesheets: HtmlStyles[],
   renderers: HtmlRenderers,
@@ -129,7 +144,7 @@ export const renderElements = (
         if (options.collapse) {
           element = collapseWhitespace(element);
         }
-        return options.renderer(
+        return renderElement(
           element,
           options.stylesheets,
           options.renderers,
@@ -137,7 +152,7 @@ export const renderElements = (
           index
         );
       }
-      return options.renderer(
+      return renderElement(
         element,
         options.stylesheets,
         options.renderers,
@@ -172,79 +187,59 @@ export const applyStylesheets = (
   });
 };
 
-export type HtmlRenderer = React.FC<{
-  element: HtmlElement;
-  style: Style[];
-  stylesheets: HtmlStyles[];
-}>;
-
-export type HtmlRenderers = Record<Tag | string, HtmlRenderer>;
-
-export type HtmlContentRenderer = (
-  element: HtmlElement | string,
-  stylesheets: HtmlStyles[],
-  renderers: HtmlRenderers,
-  children?: any,
-  index?: number
-) => ReactElement | string;
-
-export type HtmlRenderOptions = {
-  collapse: boolean;
-  renderer: HtmlContentRenderer;
-  renderers: HtmlRenderers;
-  style: (Style | undefined)[];
-  stylesheets: HtmlStyles[];
-  resetStyles: boolean;
-};
-
 const renderHtml = (
   text: string,
-  options: Partial<HtmlRenderOptions> = {}
+  options: {
+    collapse?: boolean;
+    renderers?: HtmlRenderers;
+    style?: Style | (Style | undefined)[];
+    stylesheet?: HtmlStyles | HtmlStyles[];
+    resetStyles?: boolean;
+  }
 ): ReactElement => {
   const defaultFontSize = 18;
   const fontSizeStyle = { fontSize: defaultFontSize };
-  if (options.style) {
-    options.style.forEach((style) => {
-      if (!style) {
-        return;
-      }
-      if (style.fontSize === 'number') {
-        fontSizeStyle.fontSize = (style.fontSize as unknown) as number;
-      }
-      if (style.fontSize === 'string' && style.fontSize.endsWith('px')) {
-        fontSizeStyle.fontSize = parseInt(style.fontSize, 10);
-      }
-    });
-  }
-  const defaults: HtmlRenderOptions = {
-    collapse: true,
-    renderer: defaultRenderer,
-    renderers,
-    style: [],
-    stylesheets: [],
-    resetStyles: false,
-  };
+  const styles = options.style
+    ? Array.isArray(options.style)
+      ? options.style
+      : [options.style]
+    : [];
+
+  styles.forEach((style) => {
+    if (!style) {
+      return;
+    }
+    if (typeof style.fontSize === 'number') {
+      fontSizeStyle.fontSize = (style.fontSize as unknown) as number;
+    }
+    if (typeof style.fontSize === 'string' && style.fontSize.endsWith('px')) {
+      fontSizeStyle.fontSize = parseInt(style.fontSize, 10);
+    }
+  });
   const baseStyles = createHtmlStylesheet(
     fontSizeStyle.fontSize,
     options.resetStyles
   );
   const parsed = parseHtml(text);
 
-  const opts = {
-    ...defaults,
+  const stylesheets = options.stylesheet
+    ? Array.isArray(options.stylesheet)
+      ? options.stylesheet
+      : [options.stylesheet]
+    : [];
+
+  const opts: HtmlRenderOptions = {
+    collapse: true,
+    resetStyles: false,
     ...options,
-    renderers: { ...options.renderers, ...defaults.renderers },
-    stylesheets: [
-      baseStyles,
-      ...(options.stylesheets || []),
-      ...parsed.stylesheets,
-    ],
+    renderers: { ...options.renderers, ...renderers },
+    stylesheets: [baseStyles, ...stylesheets, ...parsed.stylesheets],
   };
 
   applyStylesheets(opts.stylesheets, parsed.rootElement);
 
   return (
-    <View style={{ ...options.style, ...fontSizeStyle }}>
+    <View style={{ ...styles, ...fontSizeStyle }}>
       {renderElements(parsed.rootElement.content, opts)}
     </View>
   );
