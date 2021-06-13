@@ -2,7 +2,7 @@
 
 `<Html>` component for [react-pdf](https://github.com/diegomura/react-pdf/)
 
-- Support for CSS using in-document `<style>` tags and element `style` attributes (limited to `Style` properties supported by `react-pdf`)
+- Support for CSS via `<style>` tags and `style` attributes (limited to `Style` properties supported by `react-pdf`)
 - [Browser CSS defaults](https://www.w3schools.com/cssref/css_default_values.asp) with option for [style reset](https://meyerweb.com/eric/tools/css/reset/)
 - Basic `<table>`(attempted using flex layouts) `<ul>` and `<ol>` support
 - Ability to provide custom renderers for any tag
