@@ -6,113 +6,112 @@ export type HtmlStyles = Record<Tag | string, Style>;
 
 export const createHtmlStylesheet = <T extends HtmlStyles>(
   fontSize: number,
-  reset: boolean = false,
-  overrides?: T
+  reset: boolean = false
 ): HtmlStyles => {
   const em = (em: number, relativeSize: number = fontSize) => em * relativeSize;
 
   let base: HtmlStyles = {
-    BODY: {
+    body: {
       margin: 8,
       fontFamily: 'Times-Roman',
     },
-    H1: {
+    h1: {
       fontSize: em(2),
       marginVertical: em(0.67, em(2)),
       fontWeight: 'bold',
     },
-    H2: {
+    h2: {
       fontSize: em(1.5),
       marginVertical: em(0.83, em(1.5)),
       fontWeight: 'bold',
     },
-    H3: {
+    h3: {
       fontSize: em(1.17),
       marginVertical: em(1, em(1.17)),
       fontWeight: 'bold',
     },
-    H4: {
+    h4: {
       fontSize: em(1),
       marginVertical: em(1.33, em(1)),
       fontWeight: 'bold',
     },
-    H5: {
+    h5: {
       fontSize: em(0.83),
       marginVertical: em(1.67, em(0.83)),
       fontWeight: 'bold',
     },
-    H6: {
+    h6: {
       fontSize: em(0.67),
       marginVertical: em(2.33, em(0.67)),
       fontWeight: 'bold',
     },
-    P: {
+    p: {
       fontSize: em(1),
       marginVertical: em(1),
     },
-    BLOCKQUOTE: {
+    blockquote: {
       marginVertical: em(1),
       marginHorizontal: 30,
     },
-    HR: {
+    hr: {
       marginVertical: em(0.5),
       borderBottomWidth: 1,
       borderBottomColor: '#000',
     },
-    ADDRESS: {
+    address: {
       fontStyle: 'italic',
     },
-    PRE: {
+    pre: {
       // fontFamily: 'monospace',
       // whiteSpace: 'pre',
       marginVertical: em(1),
     },
-    B: {
+    b: {
       fontWeight: 'bold',
     },
-    STRONG: {
+    strong: {
       fontWeight: 'bold',
     },
-    I: {
+    i: {
       fontStyle: 'italic',
     },
-    EM: {
+    em: {
       fontStyle: 'italic',
     },
-    S: {
+    s: {
       textDecoration: 'line-through',
     },
-    U: {
+    u: {
       textDecoration: 'underline',
     },
-    CODE: {
+    code: {
       // fontFamily: 'monospace',
     },
-    A: {
+    a: {
       textDecoration: 'underline',
     },
-    UL: {
+    ul: {
       marginVertical: em(1),
     },
-    OL: {
+    ol: {
       marginVertical: em(1),
     },
-    LI: {
+    li: {
       display: 'flex',
       flexDirection: 'row',
     },
-    LI_bullet: {
+    li_bullet: {
       width: 30,
       textAlign: 'right',
       flexShrink: 0,
       flexGrow: 0,
       paddingRight: 5,
     },
-    LI_content: {
+    li_content: {
       textAlign: 'left',
       flexGrow: 1,
     },
-    TABLE: {
+    table: {
       display: 'flex',
       flexDirection: 'column',
       // borderColor: 'gray',
@@ -121,25 +120,25 @@ export const createHtmlStylesheet = <T extends HtmlStyles>(
       borderCollapse: 'collapse',
       // borderSpacing: 2,
     } as any,
-    THEAD: {
+    thead: {
       display: 'flex',
       flexDirection: 'column',
     },
-    TBODY: {
+    tbody: {
       display: 'flex',
       flexDirection: 'column',
     },
-    TR: {
+    tr: {
       display: 'flex',
       flexDirection: 'row',
       flexShrink: 1,
     },
-    TD: {
+    td: {
       flexGrow: 1,
       flexShrink: 1,
       flexBasis: 1,
     },
-    TH: {
+    th: {
       flexGrow: 1,
       flexShrink: 1,
       flexBasis: 1,
@@ -159,16 +158,9 @@ export const createHtmlStylesheet = <T extends HtmlStyles>(
         }
       }
     }
-    base.LI_bullet.display = 'none';
-    (base.TABLE as any).borderCollapse = 'collapse';
-    (base.TABLE as any).borderSpacing = 0;
-  }
-
-  if (overrides) {
-    for (const key of Object.keys(overrides)) {
-      // TODO: use StyleSheet.flatten, but it appears to be broken...
-      base[key] = { ...base[key], ...overrides[key] };
-    }
+    base.li_bullet.display = 'none';
+    (base.table as any).borderCollapse = 'collapse';
+    (base.table as any).borderSpacing = 0;
   }
 
   return StyleSheet.create(base);

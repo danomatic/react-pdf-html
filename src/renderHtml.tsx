@@ -77,14 +77,15 @@ export const bucketElements = (
   return buckets;
 };
 
-export const getClassStyles = (classNames: string[], stylesheet: HtmlStyles) =>
+export const getClassStyles = (classNames: string, stylesheet: HtmlStyles) =>
   classNames
-    .filter((className) => className in stylesheet)
+    .split(/(\s+)/g)
+    .filter((className) => className !== '' && className in stylesheet)
     .map((className) => stylesheet[className]);
 
 export const defaultRenderer: HtmlContentRenderer = (
   element: HtmlElement | string,
-  stylesheet: HtmlStyles,
+  stylesheets: HtmlStyles[],
   renderers: HtmlRenderers,
   children?: any,
   index?: number
@@ -96,22 +97,19 @@ export const defaultRenderer: HtmlContentRenderer = (
   if (!Element) {
     if (!(element.tag in isBlock)) {
       // Unknown element, do nothing
+      console.warn(`Excluding "${element.tag}" because it has no renderer`);
       Element = renderNoop;
+    } else {
+      Element = hasBlockContent(element) ? renderBlock : renderInline;
     }
-    Element = hasBlockContent(element) ? renderBlock : renderInline;
   }
-  const style = [
-    stylesheet[element.tag],
-    ...getClassStyles(element.classNames, stylesheet),
-    element.style || {},
-  ];
   return (
     <Element
       key={index}
-      style={style}
+      style={element.style}
       children={children}
       element={element}
-      stylesheet={stylesheet}
+      stylesheets={stylesheets}
     />
   );
 };
@@ -133,7 +131,7 @@ export const renderElements = (
         }
         return options.renderer(
           element,
-          options.stylesheet,
+          options.stylesheets,
           options.renderers,
           undefined,
           index
@@ -141,11 +139,11 @@ export const renderElements = (
       }
       return options.renderer(
         element,
-        options.stylesheet,
+        options.stylesheets,
         options.renderers,
         renderElements(
           element.content,
-          element.tag === 'PRE' ? { ...options, collapse: false } : options,
+          element.tag === 'pre' ? { ...options, collapse: false } : options,
           element.tag
         ),
         index
@@ -160,17 +158,31 @@ export const renderElements = (
   });
 };
 
+export const applyStylesheets = (
+  stylesheets: HtmlStyles[],
+  rootElement: HtmlElement
+) => {
+  stylesheets.forEach((stylesheet) => {
+    for (const selector of Object.keys(stylesheet)) {
+      const elements = rootElement.querySelectorAll(selector) as HtmlElement[];
+      elements.forEach((element) => {
+        element.style.unshift(stylesheet[selector]);
+      });
+    }
+  });
+};
+
 export type HtmlRenderer = React.FC<{
   element: HtmlElement;
   style: Style[];
-  stylesheet: HtmlStyles;
+  stylesheets: HtmlStyles[];
 }>;
 
 export type HtmlRenderers = Record<Tag | string, HtmlRenderer>;
 
 export type HtmlContentRenderer = (
   element: HtmlElement | string,
-  stylesheet: HtmlStyles,
+  stylesheets: HtmlStyles[],
   renderers: HtmlRenderers,
   children?: any,
   index?: number
@@ -180,8 +192,8 @@ export type HtmlRenderOptions = {
   collapse: boolean;
   renderer: HtmlContentRenderer;
   renderers: HtmlRenderers;
-  style: Style;
-  stylesheet: HtmlStyles;
+  style: (Style | undefined)[];
+  stylesheets: HtmlStyles[];
   resetStyles: boolean;
 };
 
@@ -190,33 +202,50 @@ const renderHtml = (
   options: Partial<HtmlRenderOptions> = {}
 ): ReactElement => {
   const defaultFontSize = 18;
-  const fontSize =
-    typeof options.style?.fontSize === 'number'
-      ? options.style.fontSize
-      : defaultFontSize;
+  const fontSizeStyle = { fontSize: defaultFontSize };
+  if (options.style) {
+    options.style.forEach((style) => {
+      if (!style) {
+        return;
+      }
+      if (style.fontSize === 'number') {
+        fontSizeStyle.fontSize = (style.fontSize as unknown) as number;
+      }
+      if (style.fontSize === 'string' && style.fontSize.endsWith('px')) {
+        fontSizeStyle.fontSize = parseInt(style.fontSize, 10);
+      }
+    });
+  }
   const defaults: HtmlRenderOptions = {
     collapse: true,
     renderer: defaultRenderer,
     renderers,
-    style: {},
-    stylesheet: {},
+    style: [],
+    stylesheets: [],
     resetStyles: false,
   };
+  const baseStyles = createHtmlStylesheet(
+    fontSizeStyle.fontSize,
+    options.resetStyles
+  );
+  const parsed = parseHtml(text);
+
   const opts = {
     ...defaults,
     ...options,
     renderers: { ...options.renderers, ...defaults.renderers },
-    stylesheet: createHtmlStylesheet(
-      fontSize,
-      options.resetStyles,
-      options.stylesheet
-    ),
+    stylesheets: [
+      baseStyles,
+      ...(options.stylesheets || []),
+      ...parsed.stylesheets,
+    ],
   };
-  const parsed = parseHtml(text);
+
+  applyStylesheets(opts.stylesheets, parsed.rootElement);
 
   return (
-    <View style={{ ...options.style, fontSize }}>
-      {renderElements(parsed, opts)}
+    <View style={{ ...options.style, ...fontSizeStyle }}>
+      {renderElements(parsed.rootElement.content, opts)}
     </View>
   );
 };

@@ -9,22 +9,70 @@ import { Style } from '@react-pdf/types';
 import { Tag } from './tags';
 import css, { Declaration, Rule } from 'css';
 import supportedStyles from './supportedStyles';
+import { HtmlStyles } from './styles';
 const camelize = require('camelize');
 
 export type HtmlContent = (HtmlElement | string)[];
 
-export type HtmlElement = {
-  tag: Tag | string;
-  attributes: Record<string, string>;
-  style?: Style;
-  classNames: string[];
+export type HtmlElement = HTMLElement & {
+  tag: Tag | 'string';
+  parentNode: HtmlElement;
+  style: Style[];
   content: HtmlContent;
-  parentTag?: string;
-  index?: number;
-  indexOfKind?: number;
+  indexOfKind: number;
+  querySelectorAll: (selector: string) => HtmlElement[];
+  querySelector: (selector: string) => HtmlElement;
 };
 
-export const convertStyle = (
+export const convertRule = (rule: Rule, source: string = 'style'): Style => {
+  const declarations: Declaration[] =
+    rule.declarations?.filter(
+      (declaration) => declaration.type === 'declaration'
+    ) || [];
+
+  return declarations
+    .map((entry) => ({
+      ...entry,
+      property: camelize(entry.property as string),
+    }))
+    .reduce((style, { property, value }) => {
+      if (property && value) {
+        if (!property || !supportedStyles.includes(property)) {
+          if (property === 'background' && /^(#|)[a-zA-Z0-9]+$/.test(value)) {
+            property = 'backgroundColor';
+          } else {
+            console.warn(`${source}: Found unsupported style "${property}"`, {
+              property,
+              value,
+            });
+          }
+        }
+
+        style[property as keyof Style] = value;
+      }
+      return style;
+    }, {} as Style);
+};
+
+export const convertStylesheet = (stylesheet: string): HtmlStyles => {
+  const response = {} as HtmlStyles;
+  try {
+    const parsed = css.parse(stylesheet);
+    const rules: Rule[] =
+      parsed.stylesheet?.rules?.filter((rule) => rule.type === 'rule') || [];
+    rules.forEach((rule) => {
+      const style = convertRule(rule);
+      rule.selectors?.forEach((selector) => {
+        response[selector] = style;
+      });
+    });
+  } catch (e) {
+    console.error(`Error parsing stylesheet: "${stylesheet}"`, e);
+  }
+  return response;
+};
+
+export const convertElementStyle = (
   styleAttr: string,
   tag: string
 ): Style | undefined => {
@@ -34,34 +82,8 @@ export const convertStyle = (
     });
     const rules: Rule[] =
       parsed.stylesheet?.rules?.filter((rule) => rule.type === 'rule') || [];
-    const declarations: Declaration[] =
-      rules
-        .shift()
-        ?.declarations?.filter(
-          (declaration) => declaration.type === 'declaration'
-        ) || [];
-    return declarations
-      .map((entry) => ({
-        ...entry,
-        property: camelize(entry.property as string),
-      }))
-      .reduce((style, { property, value }) => {
-        if (property && value) {
-          if (!property || !supportedStyles.includes(property)) {
-            if (property === 'background' && /^(#|)[a-zA-Z0-9]+$/.test(value)) {
-              property = 'backgroundColor';
-            } else {
-              console.warn(
-                `${tag}: Found unsupported style "${property}"`,
-                { property, value }
-              );
-            }
-          }
-
-          style[property as keyof Style] = value;
-        }
-        return style;
-      }, {} as Style);
+    const firstRule = rules.shift();
+    return firstRule ? convertRule(firstRule, tag) : undefined;
   } catch (e) {
     console.error(
       `Error parsing style attribute "${styleAttr}" for tag: ${tag}`,
@@ -81,13 +103,10 @@ export const convertNode = (node: HTMLNode): HtmlElement | string => {
     throw new Error('Not sure what this is');
   }
   const html = node as HTMLElement;
-  const tag = html.tagName;
   const content = html.childNodes.map(convertNode);
   const kindCounters: Record<string, number> = {};
-  content.forEach((child, index) => {
+  content.forEach((child) => {
     if (typeof child !== 'string') {
-      child.parentTag = tag;
-      child.index = index;
       child.indexOfKind =
         child.tag in kindCounters
           ? (kindCounters[child.tag] = kindCounters[child.tag] + 1)
@@ -97,24 +116,32 @@ export const convertNode = (node: HTMLNode): HtmlElement | string => {
 
   let style: Style | undefined;
   if (html.attributes.style && html.attributes.style.trim()) {
-    style = convertStyle(html.attributes.style, tag);
-    console.log(tag, style);
+    style = convertElementStyle(html.attributes.style, html.tagName);
   }
 
-  return {
-    tag,
-    attributes: html.attributes,
-    style,
-    classNames: html.classNames.split(/(\s+)/g).filter((value) => value !== ''),
+  return Object.assign(html, {
+    tag: (html.tagName || '').toLowerCase() as Tag | string,
+    style: style ? [style] : [],
     content,
-    parentTag: undefined,
     indexOfKind: 0,
-  };
+  }) as HtmlElement;
 };
 
-const parseHtml = (text: string): HtmlContent => {
-  const html = parse(text);
-  return html.childNodes.map(convertNode);
+const parseHtml = (
+  text: string
+): { stylesheets: HtmlStyles[]; rootElement: HtmlElement } => {
+  const html = parse(text, { comment: false });
+  const stylesheets = html
+    .querySelectorAll('style')
+    .map((styleNode) =>
+      styleNode.childNodes.map((textNode) => textNode.rawText.trim()).join('\n')
+    )
+    .filter((styleText) => !!styleText)
+    .map(convertStylesheet);
+  return {
+    stylesheets,
+    rootElement: convertNode(html) as HtmlElement,
+  };
 };
 
 export default parseHtml;

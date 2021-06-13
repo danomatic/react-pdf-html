@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, Text, View, Image } from '@react-pdf/renderer';
 import { Style } from '@react-pdf/types';
 import { HtmlRenderer, HtmlRenderers } from './renderHtml';
+import { HtmlElement } from './parseHtml';
 
 export const renderNoop: HtmlRenderer = ({ children }) => <></>;
 
@@ -13,13 +14,15 @@ export const renderInline: HtmlRenderer = ({ style, children }) => (
   <Text style={style}>{children}</Text>
 );
 
-export const renderCell: HtmlRenderer = ({
-  stylesheet,
-  style,
-  element,
-  children,
-}) => {
-  const tableStyles = stylesheet.TABLE || {};
+export const renderCell: HtmlRenderer = ({ style, element, children }) => {
+  const table = element.closest('table') as HtmlElement | undefined;
+  if (!table) {
+    throw new Error('td element rendered outside of a table');
+  }
+  const tableStyles = table.style.reduce(
+    (combined, tableStyle) => Object.assign(combined, tableStyle),
+    {} as Style
+  );
   const baseStyles: Style = {
     border: tableStyles.border,
     borderColor: tableStyles.borderColor,
@@ -53,31 +56,34 @@ export const renderCell: HtmlRenderer = ({
 };
 
 const renderers: HtmlRenderers = {
-  LI: ({ element, stylesheet, style, children }) => {
-    const ordered = element.parentTag === 'OL';
+  li: ({ element, stylesheets, style, children }) => {
+    const bulletStyles = stylesheets.map((stylesheet) => stylesheet.li_bullet);
+    const contentStyles = stylesheets.map(
+      (stylesheet) => stylesheet.li_content
+    );
+    const ordered = element.parentNode.tag === 'ol';
     return (
       <View style={style}>
-        <View style={stylesheet.LI_bullet}>
-          <Text>
-            {ordered && typeof element.indexOfKind === 'number'
-              ? element.indexOfKind + 1 + '.'
-              : '•'}
-          </Text>
+        <View style={bulletStyles}>
+          <Text>{ordered ? element.indexOfKind + 1 + '.' : '•'}</Text>
         </View>
-        <Text style={stylesheet.LI_content}>{children}</Text>
+        <Text style={contentStyles}>{children}</Text>
       </View>
     );
   },
-  A: ({ style, element, children }) => (
+  a: ({ style, element, children }) => (
     <Link style={style} src={element.attributes.href}>
       {children}
     </Link>
   ),
-  IMG: ({ style, element }) => (
+  img: ({ style, element }) => (
     <Image style={style} src={element.attributes.src} />
   ),
-  TABLE: ({ stylesheet, style, children }) => {
-    const tableStyles = stylesheet.TABLE || {};
+  table: ({ element, style, children }) => {
+    const tableStyles = element.style.reduce(
+      (combined, tableStyle) => Object.assign(combined, tableStyle),
+      {} as Style
+    );
     const overrides: Style = {};
     if (
       !(tableStyles as any).borderSpacing ||
@@ -89,18 +95,18 @@ const renderers: HtmlRenderers = {
 
     return <View style={[...style, overrides]}>{children}</View>;
   },
-  TR: ({ style, children }) => (
+  tr: ({ style, children }) => (
     <View wrap={false} style={style}>
       {children}
     </View>
   ),
-  BR: ({ style }) => (
+  br: ({ style }) => (
     <View wrap={false} style={style}>
       <Text> </Text>
     </View>
   ),
-  TD: renderCell,
-  TH: renderCell,
+  td: renderCell,
+  th: renderCell,
 };
 
 export default renderers;
