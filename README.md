@@ -13,7 +13,7 @@ Hopefully the author of `react-pdf` will simply integrate it so that the communi
 
 1. Uses `node-html-parser` (see https://github.com/taoqf/node-html-parser) to parse the HTML into a JSON tree.
 2. Parses any `<style>` tags in the document and `style` attributes
-3. Renders the tree with `renderHtml`, which applies all the styles and has a mapping of render functions. This can be overridden using the `renderer` prop.
+3. Renders the tree, applying all the styles and has a mapping of render functions. These can be overridden on a per tag basis using the `renderers` prop.
 
 ## Usage
 
