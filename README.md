@@ -102,6 +102,43 @@ return (
 );
 ```
 
+## Rendering React Components
+
+```tsx
+import ReactDOMServer from 'react-dom/server';
+
+const element = (
+  <html>
+    <body>
+      <style>
+        {`
+        .heading4 {
+          background: darkgreen;
+          color: white;
+        }
+        pre {
+          background-color: #eee;
+          padding: 10px;
+        }`}
+      </style>
+      <h1>Heading 1</h1>
+      <h2 style={{ backgroundColor: 'pink' }}>Heading 2</h2>
+      ...
+    </body>
+  </html>
+);
+
+const html = ReactDOMServer.renderToStaticMarkup(element);
+
+return (
+  <Document>
+    <Page>
+      <Html>{html}</Html>
+    </Page>
+  </Document>
+);
+```
+
 ## Props
 
 ```ts
