@@ -38,7 +38,11 @@ export const convertRule = (rule: Rule, source: string = 'style'): Style => {
     .reduce((style, { property, value }) => {
       if (property && value) {
         if (!property || !supportedStyles.includes(property)) {
-          if (property === 'background' && /^(#|)[a-zA-Z0-9]+$/.test(value)) {
+          if (
+            (property === 'background' && /^#?[a-zA-Z0-9]+$/.test(value)) ||
+            /^rgba?\([0-9, ]+\)$/i.test(value) ||
+            /^hsla?\([0-9.%, ]+\)$/i.test(value)
+          ) {
             property = 'backgroundColor';
           } else {
             console.warn(`${source}: Found unsupported style "${property}"`, {
