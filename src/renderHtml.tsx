@@ -26,6 +26,27 @@ type ContentBucket = {
   content: HtmlContent;
 };
 
+const convertEntities = (input: string) => {
+  const entities = [
+    ['amp', '&'],
+    ['apos', "'"],
+    ['#x27', "'"],
+    ['#x2F', '/'],
+    ['#39', "'"],
+    ['#47', '/'],
+    ['lt', '<'],
+    ['gt', '>'],
+    ['nbsp', ' '],
+    ['quot', '"'],
+  ];
+
+  let text = input;
+  for (let entity of entities) {
+    text = text.replace(new RegExp('&' + entity[0] + ';', 'g'), entity[1]);
+  }
+  return text;
+};
+
 export const hasBlockContent = (element: HtmlElement | string): boolean => {
   if (typeof element === 'string') {
     return false;
@@ -88,7 +109,7 @@ export const bucketElements = (
     }
     if (typeof element === 'string' && parentTag === 'pre') {
       // trick to avoid whitespace collapse
-      bucket.content.push(...element.split(''));
+      bucket.content.push(...convertEntities(element).split(''));
     } else {
       bucket.content.push(element);
     }
@@ -105,7 +126,7 @@ export const renderElement = (
   index?: number
 ): ReactElement | string => {
   if (typeof element === 'string') {
-    return element;
+    return convertEntities(element);
   }
   let Element: HtmlRenderer | undefined = renderers[element.tag];
   if (!Element) {
