@@ -1,7 +1,7 @@
 import React, { ReactElement } from 'react';
 import renderers, { renderBlock, renderInline, renderNoop } from './renderers';
 import { Text, View } from '@react-pdf/renderer';
-import parseHtml, { HtmlContent, HtmlElement } from './parseHtml';
+import parseHtml, { HtmlContent, HtmlElement } from './parse';
 import { createHtmlStylesheet, HtmlStyles } from './styles';
 import { Style } from '@react-pdf/types';
 import { isBlock, Tag } from './tags';

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link, Text, View, Image } from '@react-pdf/renderer';
 import { Style } from '@react-pdf/types';
-import { HtmlRenderer, HtmlRenderers } from './renderHtml';
-import { HtmlElement } from './parseHtml';
+import { HtmlRenderer, HtmlRenderers } from './render';
+import { HtmlElement } from './parse';
 
 export const renderNoop: HtmlRenderer = ({ children }) => <></>;
 

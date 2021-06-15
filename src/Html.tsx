@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import renderHtml, { HtmlRenderers } from './renderHtml';
+import renderHtml, { HtmlRenderers } from './render';
 import { Style } from '@react-pdf/types';
 import { HtmlStyles } from './styles';
 

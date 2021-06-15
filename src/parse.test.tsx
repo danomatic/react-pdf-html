@@ -1,4 +1,4 @@
-import parseHtml from './parseHtml';
+import parseHtml from './parse';
 
 describe('parseHtml', () => {
   it('Should convert HTML into a JSON tree', () => {
