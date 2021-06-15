@@ -98,7 +98,7 @@ export const convertElementStyle = (
 
 export const convertNode = (node: HTMLNode): HtmlElement | string => {
   if (node.nodeType === NodeType.TEXT_NODE) {
-    return (node as TextNode).innerText;
+    return (node as TextNode).rawText;
   }
   if (node.nodeType === NodeType.COMMENT_NODE) {
     return '';

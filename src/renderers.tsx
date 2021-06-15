@@ -56,6 +56,8 @@ export const renderCell: HtmlRenderer = ({ style, element, children }) => {
 };
 
 const renderers: HtmlRenderers = {
+  style: renderNoop,
+  script: renderNoop,
   li: ({ element, stylesheets, style, children }) => {
     const bulletStyles = stylesheets.map((stylesheet) => stylesheet.li_bullet);
     const contentStyles = stylesheets.map(

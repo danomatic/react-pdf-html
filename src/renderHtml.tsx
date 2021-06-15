@@ -107,12 +107,7 @@ export const bucketElements = (
       };
       buckets.push(bucket);
     }
-    if (typeof element === 'string' && parentTag === 'pre') {
-      // trick to avoid whitespace collapse
-      bucket.content.push(...convertEntities(element).split(''));
-    } else {
-      bucket.content.push(element);
-    }
+    bucket.content.push(element);
   });
 
   return buckets;
@@ -124,9 +119,22 @@ export const renderElement = (
   renderers: HtmlRenderers,
   children?: any,
   index?: number
-): ReactElement | string => {
+): ReactElement | string | string[] => {
   if (typeof element === 'string') {
-    return convertEntities(element);
+    element = convertEntities(element);
+    if (/(\s )|( \s)/.test(element)) {
+      // hack to avoid collapsing sequential spaces
+      return element
+        .split(/(\s{2,})/g)
+        .reduce(
+          (strings, string, index) =>
+            string === ''
+              ? strings
+              : strings.concat(index % 2 ? string.split('') : string),
+          [] as string[]
+        );
+    }
+    return element;
   }
   let Element: HtmlRenderer | undefined = renderers[element.tag];
   if (!Element) {
