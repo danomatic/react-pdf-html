@@ -57,7 +57,7 @@ export const bucketElements = (
   elements.forEach((element, index) => {
     // clear empty strings between block elements
     if (typeof element === 'string') {
-      if (parentTag === 'PRE') {
+      if (parentTag === 'pre') {
         if (element[0] === '\n') {
           element = element.substr(1);
         }
@@ -86,17 +86,16 @@ export const bucketElements = (
       };
       buckets.push(bucket);
     }
-    bucket.content.push(element);
+    if (typeof element === 'string' && parentTag === 'pre') {
+      // trick to avoid whitespace collapse
+      bucket.content.push(...element.split(''));
+    } else {
+      bucket.content.push(element);
+    }
   });
 
   return buckets;
 };
-
-export const getClassStyles = (classNames: string, stylesheet: HtmlStyles) =>
-  classNames
-    .split(/(\s+)/g)
-    .filter((className) => className !== '' && className in stylesheet)
-    .map((className) => stylesheet[className]);
 
 export const renderElement = (
   element: HtmlElement | string,
