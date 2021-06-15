@@ -29,6 +29,10 @@ const html = `<html>
         background: darkgreen;
         color: white;
       }
+      pre {
+        background-color: #eee;
+        padding: 10px;
+      }
     </style>
     <h1>Heading 1</h1>
     <h2 style="background-color: pink">Heading 2</h2>
@@ -81,9 +85,10 @@ const html = `<html>
     </table>
     <div style="width: 200px; height: 200px; background: pink"></div>
     <pre>
-    const foo = 'bar';
-    const bar = 'foo';
-    </pre>
+function myCode() {
+  const foo = 'bar';
+}
+</pre>
   </body>
 </html>
 `;
@@ -118,7 +123,7 @@ type HtmlProps = {
 const stylesheet = {
   // clear margins for all <p> tags
   p: {
-    margin: 0, 
+    margin: 0,
   },
   // add pink background color to elements with class="special"
   ['.special']: {
