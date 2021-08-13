@@ -1,0 +1,4 @@
+/**
+!/dist/*.js
+/dist/*.test.js
+!/tsconfig.json
