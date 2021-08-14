@@ -17,10 +17,15 @@
     - `<img>` nodes using `<Image>`
     - `<a>` nodes using `<Link>`
 
+## Installation
+```bash
+npm i react-pdf-html
+```
+
 ## Usage
 
 ```tsx
-import { Html } from 'react-pdf-html'; // not yet available as an NPM package, so just download the files
+import Html from 'react-pdf-html';
 
 const html = `<html>
   <body>
