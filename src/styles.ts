@@ -2,7 +2,16 @@ import { StyleSheet } from '@react-pdf/renderer';
 import { Style } from '@react-pdf/types';
 import { Tag } from './tags';
 
-export type HtmlStyles = Record<Tag | string, Style>;
+export type HtmlStyle =
+  | (Style & {
+      listStyle?: string;
+      listStyleType?: string;
+      borderSpacing?: number | string;
+      borderCollapse?: string;
+    })
+  | any;
+
+export type HtmlStyles = Record<Tag | string, HtmlStyle>;
 
 export const createHtmlStylesheet = <T extends HtmlStyles>(
   fontSize: number,
@@ -159,8 +168,8 @@ export const createHtmlStylesheet = <T extends HtmlStyles>(
       }
     }
     base.li_bullet.display = 'none';
-    (base.table as any).borderCollapse = 'collapse';
-    (base.table as any).borderSpacing = 0;
+    base.table.borderCollapse = 'collapse';
+    base.table.borderSpacing = 0;
   }
 
   return StyleSheet.create(base);

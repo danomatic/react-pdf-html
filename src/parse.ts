@@ -5,11 +5,10 @@ import {
   parse,
   TextNode,
 } from 'node-html-parser';
-import { Style } from '@react-pdf/types';
 import { Tag } from './tags';
 import css, { Declaration, Rule } from 'css';
 import supportedStyles from './supportedStyles';
-import { HtmlStyles } from './styles';
+import { HtmlStyle, HtmlStyles } from './styles';
 const camelize = require('camelize');
 
 export type HtmlContent = (HtmlElement | string)[];
@@ -17,14 +16,17 @@ export type HtmlContent = (HtmlElement | string)[];
 export type HtmlElement = HTMLElement & {
   tag: Tag | 'string';
   parentNode: HtmlElement;
-  style: Style[];
+  style: HtmlStyle[];
   content: HtmlContent;
   indexOfType: number;
   querySelectorAll: (selector: string) => HtmlElement[];
   querySelector: (selector: string) => HtmlElement;
 };
 
-export const convertRule = (rule: Rule, source: string = 'style'): Style => {
+export const convertRule = (
+  rule: Rule,
+  source: string = 'style'
+): HtmlStyle => {
   const declarations: Declaration[] =
     rule.declarations?.filter(
       (declaration) => declaration.type === 'declaration'
@@ -52,10 +54,10 @@ export const convertRule = (rule: Rule, source: string = 'style'): Style => {
           }
         }
 
-        style[property as keyof Style] = value;
+        style[property as keyof HtmlStyle] = value;
       }
       return style;
-    }, {} as Style);
+    }, {} as HtmlStyle);
 };
 
 export const convertStylesheet = (stylesheet: string): HtmlStyles => {
@@ -79,7 +81,7 @@ export const convertStylesheet = (stylesheet: string): HtmlStyles => {
 export const convertElementStyle = (
   styleAttr: string,
   tag: string
-): Style | undefined => {
+): HtmlStyle | undefined => {
   try {
     const parsed = css.parse(`${tag} { ${styleAttr} }`, {
       source: tag,
@@ -118,7 +120,7 @@ export const convertNode = (node: HTMLNode): HtmlElement | string => {
     }
   });
 
-  let style: Style | undefined;
+  let style: HtmlStyle | undefined;
   if (html.attributes.style && html.attributes.style.trim()) {
     style = convertElementStyle(html.attributes.style, html.tagName);
   }

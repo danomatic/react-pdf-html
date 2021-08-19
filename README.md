@@ -12,12 +12,13 @@
 1. Parses the HTML string into a JSON tree of nodes using [node-html-parser](https://github.com/taoqf/node-html-parser)
 2. Parses any `<style>` tags in the document and `style` attributes using [css](https://github.com/reworkcss/css)
 3. Renders all nodes using the appropriate `react-pdf` components, applying cascading styles for each node as an array passed to the `style` prop:
-    - block/container nodes using `<View>`
-    - inline/text nodes using `<Text>`, with appropriate nesting and collapsing of whitepace
-    - `<img>` nodes using `<Image>`
-    - `<a>` nodes using `<Link>`
+   - block/container nodes using `<View>`
+   - inline/text nodes using `<Text>`, with appropriate nesting and collapsing of whitepace
+   - `<img>` nodes using `<Image>`
+   - `<a>` nodes using `<Link>`
 
 ## Installation
+
 ```bash
 npm i react-pdf-html
 ```

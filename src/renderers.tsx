@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link, Text, View, Image } from '@react-pdf/renderer';
-import { Style } from '@react-pdf/types';
 import { HtmlRenderer, HtmlRenderers } from './render';
 import { HtmlElement } from './parse';
+import { HtmlStyle } from './styles';
 
 export const renderNoop: HtmlRenderer = ({ children }) => <></>;
 
@@ -21,9 +21,9 @@ export const renderCell: HtmlRenderer = ({ style, element, children }) => {
   }
   const tableStyles = table.style.reduce(
     (combined, tableStyle) => Object.assign(combined, tableStyle),
-    {} as Style
+    {} as HtmlStyle
   );
-  const baseStyles: Style = {
+  const baseStyles: HtmlStyle = {
     border: tableStyles.border,
     borderColor: tableStyles.borderColor,
     borderWidth: tableStyles.borderWidth,
@@ -44,7 +44,7 @@ export const renderCell: HtmlRenderer = ({ style, element, children }) => {
     }
   }
 
-  const overrides: Style = {};
+  const overrides: HtmlStyle = {};
   if (element.attributes && element.attributes.colspan) {
     const colspan = parseInt(element.attributes.colspan, 10);
     if (!isNaN(colspan)) {
@@ -63,12 +63,46 @@ const renderers: HtmlRenderers = {
     const contentStyles = stylesheets.map(
       (stylesheet) => stylesheet.li_content
     );
-    const ordered = element.parentNode.tag === 'ol';
+    const list: HtmlElement = element.closest('ol, ul') as HtmlElement;
+    const ordered = list?.tag === 'ol' || element.parentNode.tag === 'ol';
+    const listStyle =
+      list?.style?.reduce(
+        (combined, listStyle) => Object.assign(combined, listStyle),
+        {} as HtmlStyle
+      ) || {};
+    const itemStyle = element.style.reduce(
+      (combined, itemStyle) => Object.assign(combined, itemStyle),
+      {} as HtmlStyle
+    );
+    const listStyleType =
+      itemStyle.listStyleType ||
+      itemStyle.listStyle ||
+      listStyle.listStyleType ||
+      listStyle.listStyle ||
+      '';
+
+    let bullet;
+    if (listStyleType.includes('none')) {
+      bullet = false;
+    } else if (listStyleType.includes('url(')) {
+      bullet = (
+        <Image
+          src={listStyleType.match(/\((.*?)\)/)[1].replace(/(['"])/g, '')}
+        />
+      );
+    } else if (ordered) {
+      bullet = <Text>{element.indexOfType + 1}.</Text>;
+    } else {
+      // if (listStyleType.includes('square')) {
+      //   bullet = <Text>■</Text>;
+      // } else {
+      bullet = <Text>•</Text>;
+      // }
+    }
+
     return (
       <View style={style}>
-        <View style={bulletStyles}>
-          <Text>{ordered ? element.indexOfType + 1 + '.' : '•'}</Text>
-        </View>
+        {bullet && <View style={bulletStyles}>{bullet}</View>}
         <Text style={contentStyles}>{children}</Text>
       </View>
     );
@@ -84,9 +118,9 @@ const renderers: HtmlRenderers = {
   table: ({ element, style, children }) => {
     const tableStyles = element.style.reduce(
       (combined, tableStyle) => Object.assign(combined, tableStyle),
-      {} as Style
+      {} as HtmlStyle
     );
-    const overrides: Style = {};
+    const overrides: HtmlStyle = {};
     if (
       !(tableStyles as any).borderSpacing ||
       (tableStyles as any).borderCollapse === 'collapse'
