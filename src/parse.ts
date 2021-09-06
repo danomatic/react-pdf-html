@@ -83,9 +83,7 @@ export const convertElementStyle = (
   tag: string
 ): HtmlStyle | undefined => {
   try {
-    const parsed = css.parse(`${tag} { ${styleAttr} }`, {
-      source: tag,
-    });
+    const parsed = css.parse(`${tag} { ${styleAttr} }`);
     const rules: Rule[] =
       parsed.stylesheet?.rules?.filter((rule) => rule.type === 'rule') || [];
     const firstRule = rules.shift();
