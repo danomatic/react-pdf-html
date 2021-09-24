@@ -7,7 +7,7 @@ import {
 } from 'node-html-parser';
 import { Tag } from './tags';
 import { Declaration, Rule } from 'css';
-import parse from 'css/lib/parse';
+import parseCSS from 'css/lib/parse';
 import supportedStyles from './supportedStyles';
 import { HtmlStyle, HtmlStyles } from './styles';
 const camelize = require('camelize');
@@ -64,7 +64,7 @@ export const convertRule = (
 export const convertStylesheet = (stylesheet: string): HtmlStyles => {
   const response = {} as HtmlStyles;
   try {
-    const parsed = css.parse(stylesheet);
+    const parsed = parseCss(stylesheet);
     const rules: Rule[] =
       parsed.stylesheet?.rules?.filter((rule) => rule.type === 'rule') || [];
     rules.forEach((rule) => {
@@ -84,7 +84,7 @@ export const convertElementStyle = (
   tag: string
 ): HtmlStyle | undefined => {
   try {
-    const parsed = css.parse(`${tag} { ${styleAttr} }`);
+    const parsed = parseCss(`${tag} { ${styleAttr} }`);
     const rules: Rule[] =
       parsed.stylesheet?.rules?.filter((rule) => rule.type === 'rule') || [];
     const firstRule = rules.shift();
