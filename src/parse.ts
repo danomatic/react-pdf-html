@@ -6,7 +6,8 @@ import {
   TextNode,
 } from 'node-html-parser';
 import { Tag } from './tags';
-import css, { Declaration, Rule } from 'css';
+import { Declaration, Rule } from 'css';
+import parse from 'css/lib/parse';
 import supportedStyles from './supportedStyles';
 import { HtmlStyle, HtmlStyles } from './styles';
 const camelize = require('camelize');
