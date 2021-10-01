@@ -6,8 +6,7 @@ import {
   TextNode,
 } from 'node-html-parser';
 import { Tag } from './tags';
-import { Declaration, Rule } from 'css';
-import parseCSS from 'css/lib/parse';
+import cssTree, { Block, Declaration, List, Rule, StyleSheet } from 'css-tree';
 import supportedStyles from './supportedStyles';
 import { HtmlStyle, HtmlStyles } from './styles';
 const camelize = require('camelize');
@@ -25,26 +24,27 @@ export type HtmlElement = HTMLElement & {
 };
 
 export const convertRule = (
-  rule: Rule,
+  rule: Block,
   source: string = 'style'
 ): HtmlStyle => {
-  const declarations: Declaration[] =
-    rule.declarations?.filter(
-      (declaration) => declaration.type === 'declaration'
-    ) || [];
+  const declarations = rule.children
+    .filter((declaration) => declaration.type === 'Declaration')
+    .toArray() as Declaration[];
 
   return declarations
     .map((entry) => ({
       ...entry,
       property: camelize(entry.property as string),
     }))
-    .reduce((style, { property, value }) => {
+    .reduce((style, { property, value }: Declaration) => {
+      const valueString = cssTree.generate(value);
       if (property && value) {
         if (!property || !supportedStyles.includes(property)) {
           if (
-            (property === 'background' && /^#?[a-zA-Z0-9]+$/.test(value)) ||
-            /^rgba?\([0-9, ]+\)$/i.test(value) ||
-            /^hsla?\([0-9.%, ]+\)$/i.test(value)
+            (property === 'background' &&
+              /^#?[a-zA-Z0-9]+$/.test(valueString)) ||
+            /^rgba?\([0-9, ]+\)$/i.test(valueString) ||
+            /^hsla?\([0-9.%, ]+\)$/i.test(valueString)
           ) {
             property = 'backgroundColor';
           } else {
@@ -55,7 +55,7 @@ export const convertRule = (
           }
         }
 
-        style[property as keyof HtmlStyle] = value;
+        style[property as keyof HtmlStyle] = valueString;
       }
       return style;
     }, {} as HtmlStyle);
@@ -64,13 +64,18 @@ export const convertRule = (
 export const convertStylesheet = (stylesheet: string): HtmlStyles => {
   const response = {} as HtmlStyles;
   try {
-    const parsed = parseCss(stylesheet);
-    const rules: Rule[] =
-      parsed.stylesheet?.rules?.filter((rule) => rule.type === 'rule') || [];
+    const parsed = cssTree.parse(stylesheet) as StyleSheet;
+    const rules = parsed.children.filter(
+      (rule) => rule.type === 'Rule' && rule.prelude?.type === 'SelectorList'
+    ) as List<Rule>;
     rules.forEach((rule) => {
-      const style = convertRule(rule);
-      rule.selectors?.forEach((selector) => {
-        response[selector] = style;
+      const style = convertRule(rule.block);
+      if (rule.prelude.type !== 'SelectorList') {
+        return;
+      }
+      rule.prelude.children.forEach((selector) => {
+        const selectorString = cssTree.generate(selector);
+        response[selectorString] = style;
       });
     });
   } catch (e) {
@@ -84,11 +89,12 @@ export const convertElementStyle = (
   tag: string
 ): HtmlStyle | undefined => {
   try {
-    const parsed = parseCss(`${tag} { ${styleAttr} }`);
-    const rules: Rule[] =
-      parsed.stylesheet?.rules?.filter((rule) => rule.type === 'rule') || [];
-    const firstRule = rules.shift();
-    return firstRule ? convertRule(firstRule, tag) : undefined;
+    const parsed = cssTree.parse(`${tag} { ${styleAttr} }`) as StyleSheet;
+    const rules = parsed.children.filter(
+      (rule) => rule.type === 'Rule' && rule.prelude?.type === 'SelectorList'
+    ) as List<Rule>;
+    const firstRule = rules.first();
+    return firstRule ? convertRule(firstRule.block, tag) : undefined;
   } catch (e) {
     console.error(
       `Error parsing style attribute "${styleAttr}" for tag: ${tag}`,

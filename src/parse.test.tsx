@@ -1,4 +1,80 @@
-import parseHtml from './parse';
+import parseHtml, { convertElementStyle, convertStylesheet } from './parse';
+
+describe('convertStylesheet', () => {
+  it('Should convert CSS into HtmlStyles', () => {
+    const content = `.my-heading4, #foobar, div > li {
+        background: darkgreen;
+        color: white;
+      }
+      div {
+        span {
+          fontWeight: bold;
+        }
+      }
+      pre {
+        background-color: #eee;
+        padding: 10px;
+      }`;
+
+    const result = convertStylesheet(content);
+    const expected = {
+      '.my-heading4': {
+        backgroundColor: 'darkgreen',
+        color: 'white',
+      },
+      '#foobar': {
+        backgroundColor: 'darkgreen',
+        color: 'white',
+      },
+      div: {
+        // TODO: support nested styles
+      },
+      'div>li': {
+        backgroundColor: 'darkgreen',
+        color: 'white',
+      },
+      pre: {
+        backgroundColor: '#eee',
+        padding: '10px',
+      },
+    };
+
+    expect(result).toEqual(expected);
+  });
+
+  it('Should handle empty', () => {
+    const content = ``;
+
+    const result = convertStylesheet(content);
+    const expected = {};
+
+    expect(result).toEqual(expected);
+  });
+});
+
+describe('convertElementStyle', () => {
+  it('Should convert element CSS into HtmlStyle', () => {
+    const content = `background: darkgreen;color: white;bogus: nope`;
+
+    const result = convertElementStyle(content, 'div');
+    const expected = {
+      backgroundColor: 'darkgreen',
+      bogus: 'nope',
+      color: 'white',
+    };
+
+    expect(result).toEqual(expected);
+  });
+
+  it('Should handle empty', () => {
+    const content = ``;
+
+    const result = convertElementStyle(content, 'div');
+    const expected = {};
+
+    expect(result).toEqual(expected);
+  });
+});
 
 describe('parseHtml', () => {
   it('Should convert HTML into a JSON tree', () => {

@@ -1,6 +1,6 @@
 {
   "name": "react-pdf-html",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "author": "Dan Blaisdell dan@manifestwebdesign.com",
   "description": "Html component for react-pdf with CSS support",
   "keywords": [
@@ -18,12 +18,12 @@
     "test": "NODE_ENV=test jest",
     "build": "rm -rf dist && tsc -p .",
     "coverage": "NODE_ENV=test jest --coverage",
-    "pretty-check": "prettier --check \"**/*.{js,ts,json,md}\"",
-    "pretty": "prettier --write \"**/*.{js,ts,json,md}\""
+    "pretty-check": "prettier --check \"**/*.{js,ts,tsx,json,md}\"",
+    "pretty": "prettier --write \"**/*.{js,ts,tsx,json,md}\""
   },
   "dependencies": {
     "camelize": "^1.0.0",
-    "css": "^3.0.0",
+    "css-tree": "^1.1.3",
     "node-html-parser": "^3.3.5"
   },
   "peerDependencies": {
@@ -31,10 +31,10 @@
     "react": ">16"
   },
   "devDependencies": {
-    "@types/css": "0.0.31",
+    "@react-pdf/renderer": "^2.0.18",
+    "@types/css-tree": "^1.0.6",
     "@types/jest": "^25.2.3",
     "@types/node": "^14.0.25",
-    "@react-pdf/renderer": "^2.0.18",
     "@types/react": "^17.0.5",
     "@types/validator": "^12.0.1",
     "husky": "^4.3.0",
@@ -51,7 +51,7 @@
     }
   },
   "lint-staged": {
-    "**/*.{js,ts,json,md}": [
+    "**/*.{js,ts,tsx,json,md}": [
       "prettier --write"
     ]
   }

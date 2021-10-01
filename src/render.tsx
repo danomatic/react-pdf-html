@@ -239,7 +239,7 @@ const renderHtml = (
       return;
     }
     if (typeof style.fontSize === 'number') {
-      fontSizeStyle.fontSize = (style.fontSize as unknown) as number;
+      fontSizeStyle.fontSize = style.fontSize as unknown as number;
     }
     if (typeof style.fontSize === 'string' && style.fontSize.endsWith('px')) {
       fontSizeStyle.fontSize = parseInt(style.fontSize, 10);
