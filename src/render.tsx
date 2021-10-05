@@ -261,7 +261,7 @@ const renderHtml = (
     collapse: true,
     resetStyles: false,
     ...options,
-    renderers: { ...options.renderers, ...renderers },
+    renderers: { ...renderers, ...options.renderers },
     stylesheets: [baseStyles, ...stylesheets, ...parsed.stylesheets],
   };
 
