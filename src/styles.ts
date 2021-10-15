@@ -93,6 +93,9 @@ export const createHtmlStylesheet = <T extends HtmlStyles>(
     u: {
       textDecoration: 'underline',
     },
+    cite: {
+      fontStyle: 'italic',
+    },
     code: {
       // fontFamily: 'monospace',
     },

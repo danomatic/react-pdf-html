@@ -18,13 +18,18 @@ export type Tag =
   | 'address'
   | 'aside'
   | 'pre'
+  | 'span'
+  | 'button'
+  | 'label'
   | 'b'
   | 'strong'
+  | 'q'
   | 'i'
   | 'em'
   | 'u'
   | 's'
   | 'cite'
+  | 'dfn'
   | 'code'
   | 'abbr'
   | 'a'
@@ -32,6 +37,13 @@ export type Tag =
   | 'ul'
   | 'ol'
   | 'li'
+  | 'dd'
+  | 'dl'
+  | 'dt'
+  | 'fieldset'
+  | 'header'
+  | 'footer'
+  | 'section'
   | 'table'
   | 'tr'
   | 'td'
@@ -60,14 +72,23 @@ export const isBlock: Record<Tag, boolean> & Record<string, boolean> = {
   address: true,
   aside: true,
   pre: true,
+  fieldset: true,
+  header: true,
+  footer: true,
+  section: true,
 
+  span: false,
+  button: false,
+  label: false,
   b: false,
   strong: false,
+  q: false,
   i: false,
   em: false,
   u: false,
   s: false,
   cite: false,
+  dfn: false,
   code: false,
   abbr: false,
 
@@ -84,4 +105,7 @@ export const isBlock: Record<Tag, boolean> & Record<string, boolean> = {
   ul: true,
   ol: true,
   li: true,
+  dd: true,
+  dl: true,
+  dt: true,
 };
