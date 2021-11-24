@@ -6,6 +6,10 @@ import { HtmlStyle } from './styles';
 
 export const renderNoop: HtmlRenderer = ({ children }) => <></>;
 
+export const renderPassThrough: HtmlRenderer = ({ children }) => (
+  <>{children}</>
+);
+
 export const renderBlock: HtmlRenderer = ({ style, children }) => (
   <View style={style}>{children}</View>
 );
@@ -58,6 +62,7 @@ export const renderCell: HtmlRenderer = ({ style, element, children }) => {
 const renderers: HtmlRenderers = {
   style: renderNoop,
   script: renderNoop,
+  html: renderPassThrough,
   li: ({ element, stylesheets, style, children }) => {
     const bulletStyles = stylesheets.map((stylesheet) => stylesheet.li_bullet);
     const contentStyles = stylesheets.map(
@@ -137,9 +142,9 @@ const renderers: HtmlRenderers = {
     </View>
   ),
   br: ({ style }) => (
-    <View wrap={false} style={style}>
-      <Text> </Text>
-    </View>
+    <Text wrap={false} style={style}>
+      {'\n'}
+    </Text>
   ),
   td: renderCell,
   th: renderCell,

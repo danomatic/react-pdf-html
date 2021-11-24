@@ -68,7 +68,6 @@ export const isBlock: Record<Tag, boolean> & Record<string, boolean> = {
   caption: true,
   form: true,
   hr: true,
-  br: true,
   address: true,
   aside: true,
   pre: true,
@@ -78,6 +77,7 @@ export const isBlock: Record<Tag, boolean> & Record<string, boolean> = {
   section: true,
 
   span: false,
+  br: false,
   button: false,
   label: false,
   b: false,
