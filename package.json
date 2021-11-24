@@ -1,6 +1,6 @@
 {
   "name": "react-pdf-html",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "author": "Dan Blaisdell dan@manifestwebdesign.com",
   "description": "Html component for react-pdf with CSS support",
   "keywords": [
@@ -27,8 +27,8 @@
     "node-html-parser": "^3.3.5"
   },
   "peerDependencies": {
-    "@react-pdf/renderer": ">2",
-    "react": ">16"
+    "@react-pdf/renderer": ">=2",
+    "react": ">=16"
   },
   "devDependencies": {
     "@react-pdf/renderer": "^2.0.18",

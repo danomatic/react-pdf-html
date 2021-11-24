@@ -131,7 +131,7 @@ export const createHtmlStylesheet = <T extends HtmlStyles>(
       flexShrink: 1,
       borderCollapse: 'collapse',
       // borderSpacing: 2,
-    } as any,
+    },
     thead: {
       display: 'flex',
       flexDirection: 'column',
