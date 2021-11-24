@@ -32,6 +32,8 @@ export type Tag =
   | 'dfn'
   | 'code'
   | 'abbr'
+  | 'sup'
+  | 'sub'
   | 'a'
   | 'img'
   | 'ul'
@@ -91,6 +93,8 @@ export const isBlock: Record<Tag, boolean> & Record<string, boolean> = {
   dfn: false,
   code: false,
   abbr: false,
+  sup: false,
+  sub: false,
 
   a: false,
   img: false,
