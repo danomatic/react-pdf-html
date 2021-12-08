@@ -162,7 +162,7 @@ export const renderElement = (
   );
 };
 
-const collapseWhitespace = (string: any): string =>
+export const collapseWhitespace = (string: any): string =>
   string.replace(/(\s+)/g, ' ');
 
 export const renderElements = (
@@ -174,11 +174,8 @@ export const renderElements = (
   return buckets.map((bucket, bucketIndex) => {
     const rendered = bucket.content.map((element, index) => {
       if (typeof element === 'string') {
-        if (options.collapse) {
-          element = collapseWhitespace(element);
-        }
         return renderElement(
-          element,
+          options.collapse ? collapseWhitespace(element) : element,
           options.stylesheets,
           options.renderers,
           undefined,
@@ -197,8 +194,8 @@ export const renderElements = (
         index
       );
     });
-    const parentIsBlock = parentTag && isBlock[parentTag] === false;
-    return bucket.hasBlock || parentIsBlock ? (
+    const parentIsInline = parentTag && isBlock[parentTag] === false;
+    return bucket.hasBlock || parentIsInline ? (
       <React.Fragment key={bucketIndex}>{rendered}</React.Fragment>
     ) : (
       <Text key={bucketIndex}>{rendered}</Text>

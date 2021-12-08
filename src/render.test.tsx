@@ -1,5 +1,5 @@
 import { HtmlContent, HtmlElement } from './parse';
-import { bucketElements, hasBlockContent } from './render';
+import { bucketElements, collapseWhitespace, hasBlockContent } from './render';
 
 const inlineElement: HtmlElement = {
   tag: 'span',
@@ -10,6 +10,12 @@ const blockElement: HtmlElement = {
 } as HtmlElement;
 
 describe('render', () => {
+  describe('collapseWhitespace', () => {
+    it('Should reduce all continuous whitespace to a single space', () => {
+      expect(collapseWhitespace('\n\n foo  \t  bar  ')).toBe(' foo bar ');
+    });
+  });
+
   describe('bucketElements', () => {
     it('Should bucket elements and trim strings correctly with collapse: true', () => {
       const stringContent = `  foo
