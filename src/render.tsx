@@ -64,12 +64,14 @@ const ltrim = (text: string): string => text.replace(/^\s+/, '');
 const rtrim = (text: string): string => text.replace(/\s+$/, '');
 
 /**
- * Groups all blocka and non-block elements into buckets so that all non-block elements can be rendered in a parent Text element
+ * Groups all block and non-block elements into buckets so that all non-block elements can be rendered in a parent Text element
  * @param elements Elements to place in buckets of block and non-block content
+ * @param collapse
  * @param parentTag
  */
 export const bucketElements = (
   elements: HtmlContent,
+  collapse: boolean,
   parentTag?: Tag | string
 ): ContentBucket[] => {
   let bucket: ContentBucket;
@@ -86,11 +88,11 @@ export const bucketElements = (
           element = element.substr(0, element.length - 1);
         }
       } else {
-        if (hasBlock || hasBlock === undefined) {
+        if (collapse && (hasBlock || hasBlock === undefined)) {
           element = ltrim(element);
         }
         const next = elements[index + 1];
-        if (next && hasBlockContent(next)) {
+        if (collapse && next && hasBlockContent(next)) {
           element = rtrim(element);
         }
       }
@@ -166,7 +168,7 @@ export const renderElements = (
   options: HtmlRenderOptions,
   parentTag?: Tag | string
 ): ReactElement[] => {
-  const buckets = bucketElements(elements, parentTag);
+  const buckets = bucketElements(elements, options.collapse, parentTag);
   return buckets.map((bucket, bucketIndex) => {
     const rendered = bucket.content.map((element, index) => {
       if (typeof element === 'string') {
