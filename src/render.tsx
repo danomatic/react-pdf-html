@@ -80,20 +80,22 @@ export const bucketElements = (
   elements.forEach((element, index) => {
     // clear empty strings between block elements
     if (typeof element === 'string') {
-      if (parentTag === 'pre') {
-        if (element[0] === '\n') {
-          element = element.substr(1);
-        }
-        if (element[element.length - 1] === '\n') {
-          element = element.substr(0, element.length - 1);
-        }
-      } else {
-        if (collapse && (hasBlock || hasBlock === undefined)) {
-          element = ltrim(element);
-        }
-        const next = elements[index + 1];
-        if (collapse && next && hasBlockContent(next)) {
-          element = rtrim(element);
+      if (collapse) {
+        if (parentTag === 'pre') {
+          if (element[0] === '\n') {
+            element = element.substr(1);
+          }
+          if (element[element.length - 1] === '\n') {
+            element = element.substr(0, element.length - 1);
+          }
+        } else {
+          if (hasBlock || hasBlock === undefined) {
+            element = ltrim(element);
+          }
+          const next = elements[index + 1];
+          if (next && hasBlockContent(next)) {
+            element = rtrim(element);
+          }
         }
       }
       if (element === '') {
