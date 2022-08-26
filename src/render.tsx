@@ -6,11 +6,13 @@ import { createHtmlStylesheet, HtmlStyles } from './styles';
 import { Style } from '@react-pdf/types';
 import { isBlock, Tag } from './tags';
 
-export type HtmlRenderer = React.FC<{
-  element: HtmlElement;
-  style: Style[];
-  stylesheets: HtmlStyles[];
-}>;
+export type HtmlRenderer = React.FC<
+  React.PropsWithChildren<{
+    element: HtmlElement;
+    style: Style[];
+    stylesheets: HtmlStyles[];
+  }>
+>;
 
 export type HtmlRenderers = Record<Tag | string, HtmlRenderer>;
 
