@@ -4,7 +4,7 @@ import { Text, View } from '@react-pdf/renderer';
 import parseHtml, { HtmlContent, HtmlElement } from './parse';
 import { createHtmlStylesheet, HtmlStyles } from './styles';
 import { Style } from '@react-pdf/types';
-import { isBlock, Tag } from './tags';
+import { isText, Tag } from './tags';
 
 export type HtmlRenderer = React.FC<
   React.PropsWithChildren<{
@@ -53,13 +53,14 @@ export const hasBlockContent = (element: HtmlElement | string): boolean => {
   if (typeof element === 'string') {
     return false;
   }
-  if (isBlock[element.tag]) {
-    return true;
+  if (isText[element.tag]) {
+    if (element.content) {
+      return element.content.findIndex(hasBlockContent) !== -1;
+    }
+    return false;
   }
-  if (element.content) {
-    return !!element.content.find(hasBlockContent);
-  }
-  return false;
+
+  return true;
 };
 
 const ltrim = (text: string): string => text.replace(/^\s+/, '');
@@ -144,7 +145,7 @@ export const renderElement = (
   }
   let Element: HtmlRenderer | undefined = renderers[element.tag];
   if (!Element) {
-    if (!(element.tag in isBlock)) {
+    if (!(element.tag in isText)) {
       // Unknown element, do nothing
       console.warn(`Excluding "${element.tag}" because it has no renderer`);
       Element = renderNoop;
@@ -196,7 +197,7 @@ export const renderElements = (
         index
       );
     });
-    const parentIsInline = parentTag && isBlock[parentTag] === false;
+    const parentIsInline = parentTag && isText[parentTag];
     return bucket.hasBlock || parentIsInline ? (
       <React.Fragment key={bucketIndex}>{rendered}</React.Fragment>
     ) : (
@@ -227,7 +228,7 @@ const renderHtml = (
     style?: Style | (Style | undefined)[];
     stylesheet?: HtmlStyles | HtmlStyles[];
     resetStyles?: boolean;
-  }
+  } = {}
 ): ReactElement => {
   const defaultFontSize = 18;
   const fontSizeStyle = { fontSize: defaultFontSize };
