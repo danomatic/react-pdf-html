@@ -207,9 +207,12 @@ export const renderElements = (
 
   const renderedBuckets: (RenderedContent[] | RenderedContent)[] = buckets.map(
     (bucket, bucketIndex) => {
-      if ((bucket.content.length === 1 && bucket.hasBlock) || parentIsInline) {
+      const wrapWithText = !bucket.hasBlock && !parentIsInline;
+
+      if (bucket.content.length === 1 && !wrapWithText) {
         return renderBucketElement(bucket.content[0], options, bucketIndex);
       }
+
       let rendered: RenderedContent | RenderedContent[] = bucket.content.map(
         (element, index) => {
           return renderBucketElement(element, options, index);
@@ -219,7 +222,7 @@ export const renderElements = (
         rendered = rendered[0];
       }
 
-      if (bucket.hasBlock || parentIsInline) {
+      if (!wrapWithText) {
         return buckets.length === 1 ? (
           rendered
         ) : (
