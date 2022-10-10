@@ -29,9 +29,7 @@ import ReactPDF, {
   Font,
   renderToString,
 } from '@react-pdf/renderer';
-import Html from './Html';
 import path from 'path';
-import Link = ReactPDF.Link;
 import renderers, { renderBlock, renderPassThrough } from './renderers';
 
 const inlineElement: HtmlElement = {
@@ -229,6 +227,7 @@ describe('render', () => {
   <body>
     <p>
         Paragraph with <strong>bold</strong>, <i>italic</i>, <u>underline</u> and <s>strikethrough</s>
+        <img src="https://images.unsplash.com/photo-1485546246426-74dc88dec4d9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2069&q=80" />
     </p>
   </body>
 </html>`;
@@ -261,10 +260,15 @@ describe('render', () => {
       const p = bodyChildrenFragment.props.children[0];
       expect(p.props.element.tag).toBe('p');
       expect(p.type).toBe(renderBlock);
+      expect(p.props.children.length).toBe(2);
 
       const pText = p.props.children[0];
       expect(pText.type).toBe(Text);
       expect(pText.props.children.length).toBe(9);
+
+      const image = p.props.children[1];
+      expect(image.element.tag).toBe('img');
+      expect(image.type).toBe(renderers.img);
 
       // pText.props.children.forEach((child: any) => {
       //   if (typeof child === 'string') {
