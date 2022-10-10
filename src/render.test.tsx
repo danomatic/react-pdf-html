@@ -30,7 +30,11 @@ import ReactPDF, {
   renderToString,
 } from '@react-pdf/renderer';
 import path from 'path';
-import renderers, { renderBlock, renderPassThrough } from './renderers';
+import renderers, {
+  renderBlock,
+  renderNoop,
+  renderPassThrough,
+} from './renderers';
 
 const inlineElement: HtmlElement = {
   tag: 'span',
@@ -108,25 +112,20 @@ describe('render', () => {
       expect(hasBlockContent(blockElement)).toBe(true);
     });
 
-    it('Should return true if any children of element are block level', () => {
-      const mysteryElementWithBlockContent: HtmlElement = {
-        tag: 'foo' as any,
+    it('Should return true for inline elements with block content', () => {
+      const inlineElementWithBlockContent: HtmlElement = {
+        tag: 'span' as any,
         content: [blockElement],
       } as HtmlElement;
-      expect(hasBlockContent(mysteryElementWithBlockContent)).toBe(true);
+      expect(hasBlockContent(inlineElementWithBlockContent)).toBe(true);
     });
 
-    it('Should return false if not block element and no children are block level', () => {
-      const mysteryElement: HtmlElement = {
-        tag: 'foo' as any,
-      } as HtmlElement;
-      expect(hasBlockContent(mysteryElement)).toBe(false);
-
-      const mysteryElementWithInlineContent: HtmlElement = {
-        tag: 'foo' as any,
+    it('Should return false for inline elements with inline content', () => {
+      const inlineElementWithBlockContent: HtmlElement = {
+        tag: 'span' as any,
         content: [inlineElement],
       } as HtmlElement;
-      expect(hasBlockContent(mysteryElementWithInlineContent)).toBe(false);
+      expect(hasBlockContent(inlineElementWithBlockContent)).toBe(false);
     });
   });
 
@@ -135,62 +134,40 @@ describe('render', () => {
       const foo = jest.fn();
 
       const html = '<foo>Custom Content</foo>';
-      const result = renderHtml(html, {
+      const rootView = renderHtml(html, {
         renderers: {
           foo,
         },
       });
-
-      const rootView = result;
-      expect(result.type).toBe(View);
-
-      const rootFragment = rootView.props.children[0];
-      expect(rootFragment.type).toBe(React.Fragment);
-
-      expect(rootFragment.props.children.length).toBe(1);
-
-      const firstChild = rootFragment.props.children[0];
+      expect(rootView.type).toBe(View);
+      const firstChild = rootView.props.children;
       expect(firstChild.type).toBe(foo);
     });
 
     it('Should render a link with text inside it', () => {
       const html = '<a href="http://google.com">link text</a>';
-      const result = renderHtml(html);
+      const rootView = renderHtml(html);
+      expect(rootView.type).toBe(View);
 
-      const rootView = result;
-      expect(result.type).toBe(View);
-
-      const rootFragment = rootView.props.children[0];
-      expect(rootFragment.type).toBe(React.Fragment);
-
-      expect(rootFragment.props.children.length).toBe(1);
-
-      const a = rootFragment.props.children[0];
+      const a = rootView.props.children;
       expect(a.type).toBe(renderers.a);
       expect(a.props.element.tag).toBe('a');
 
-      const aText = a.props.children[0];
+      const aText = a.props.children;
       expect(aText.type).toBe(Text);
-      expect(aText.props.children).toEqual(['link text']);
+      expect(aText.props.children).toEqual('link text');
     });
 
     it('Should render inline elements with proper text wrapper', () => {
       const html = `<p>Paragraph with <strong>bold</strong>, <i>italic</i>, <u>underline</u> and <s>strikethrough</s></p>`;
-      const result = renderHtml(html);
+      const rootView = renderHtml(html);
+      expect(rootView.type).toBe(View);
 
-      const rootView = result;
-      expect(result.type).toBe(View);
-
-      const rootFragment = rootView.props.children[0];
-      expect(rootFragment.type).toBe(React.Fragment);
-
-      expect(rootFragment.props.children.length).toBe(1);
-
-      const p = rootFragment.props.children[0];
+      const p = rootView.props.children;
       expect(p.props.element.tag).toBe('p');
       expect(p.type).toBe(renderBlock);
 
-      const pText = p.props.children[0];
+      const pText = p.props.children;
       expect(pText.type).toBe(Text);
       expect(pText.props.children.length).toBe(8);
     });
@@ -218,7 +195,7 @@ describe('render', () => {
 
       await Font.load({ fontFamily: 'Open Sans' });
 
-      const html = `<html>
+      const content = `<html>
   <style>
     body {
       font-family: 'Open Sans';
@@ -229,46 +206,50 @@ describe('render', () => {
         Paragraph with <strong>bold</strong>, <i>italic</i>, <u>underline</u> and <s>strikethrough</s>
         <img src="https://images.unsplash.com/photo-1485546246426-74dc88dec4d9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2069&q=80" />
     </p>
+    <ul>
+        <li>
+          First level
+          <ul><li>Second level</li></ul>
+        </li>
+    </ul>
   </body>
 </html>`;
 
-      const result = renderHtml(html);
+      const rootView = renderHtml(content);
+      expect(rootView.type).toBe(View);
 
-      const rootView = result;
-      expect(result.type).toBe(View);
+      const html = rootView.props.children;
+      expect(html.type).toBe(renderPassThrough);
+      expect(html.props.children.length).toBe(2);
 
-      const rootFragment = rootView.props.children[0];
-      expect(rootFragment.type).toBe(React.Fragment);
-      expect(rootFragment.props.children.length).toBe(1);
+      const style = html.props.children[0];
+      expect(style.type).toBe(renderNoop);
+      expect(style.props.element.tag).toBe('style');
 
-      const firstChild = rootFragment.props.children[0];
-      expect(firstChild.type).toBe(renderPassThrough); // html
-      expect(firstChild.props.children.length).toBe(1);
-
-      const htmlChildrenFragment = firstChild.props.children[0];
-      expect(htmlChildrenFragment.type).toBe(React.Fragment);
-
-      const body = htmlChildrenFragment.props.children[1];
+      const body = html.props.children[1];
       expect(body.type).toBe(renderBlock);
       expect(body.props.element.tag).toBe('body');
-      expect(body.props.children.length).toBe(1);
+      expect(body.props.children.length).toBe(2);
 
-      const bodyChildrenFragment = body.props.children[0];
-      expect(bodyChildrenFragment.type).toBe(React.Fragment);
-      expect(bodyChildrenFragment.props.children.length).toBe(1);
-
-      const p = bodyChildrenFragment.props.children[0];
-      expect(p.props.element.tag).toBe('p');
+      const p = body.props.children[0];
       expect(p.type).toBe(renderBlock);
+      expect(p.props.element.tag).toBe('p');
       expect(p.props.children.length).toBe(2);
 
       const pText = p.props.children[0];
       expect(pText.type).toBe(Text);
-      expect(pText.props.children.length).toBe(9);
+      expect(pText.props.children.length).toBe(8);
 
       const image = p.props.children[1];
-      expect(image.element.tag).toBe('img');
       expect(image.type).toBe(renderers.img);
+      expect(image.props.element.tag).toBe('img');
+
+      const ul = body.props.children[1];
+      expect(ul.type).toBe(renderBlock);
+      expect(ul.props.element.tag).toBe('ul');
+
+      const li = ul.props.children;
+      expect(li.props.children.length).toBe(2);
 
       // pText.props.children.forEach((child: any) => {
       //   if (typeof child === 'string') {
@@ -281,7 +262,7 @@ describe('render', () => {
       const document = (
         <Document>
           <Page size="LETTER">
-            <>{result}</>
+            <>{rootView}</>
           </Page>
         </Document>
       );

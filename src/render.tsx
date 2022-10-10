@@ -120,13 +120,15 @@ export const bucketElements = (
   return buckets;
 };
 
+type RenderedContent = ReactElement | ReactElement[] | string | string[];
+
 export const renderElement = (
   element: HtmlElement | string,
   stylesheets: HtmlStyles[],
   renderers: HtmlRenderers,
   children?: any,
   index?: number
-): ReactElement | string | string[] => {
+): RenderedContent => {
   if (typeof element === 'string') {
     element = convertEntities(element);
     if (/(\s )|( \s)/.test(element)) {
@@ -168,42 +170,70 @@ export const renderElement = (
 export const collapseWhitespace = (string: any): string =>
   string.replace(/(\s+)/g, ' ');
 
+export const renderBucketElement = (
+  element: HtmlElement | string,
+  options: HtmlRenderOptions,
+  index: number
+): RenderedContent => {
+  if (typeof element === 'string') {
+    return renderElement(
+      options.collapse ? collapseWhitespace(element) : element,
+      options.stylesheets,
+      options.renderers,
+      undefined,
+      index
+    );
+  }
+  return renderElement(
+    element,
+    options.stylesheets,
+    options.renderers,
+    renderElements(
+      element.content,
+      element.tag === 'pre' ? { ...options, collapse: false } : options,
+      element.tag
+    ),
+    index
+  );
+};
+
 export const renderElements = (
   elements: HtmlContent,
   options: HtmlRenderOptions,
   parentTag?: Tag | string
-): ReactElement[] => {
+): RenderedContent | RenderedContent[] => {
   const buckets = bucketElements(elements, options.collapse, parentTag);
-  return buckets.map((bucket, bucketIndex) => {
-    const rendered = bucket.content.map((element, index) => {
-      if (typeof element === 'string') {
-        return renderElement(
-          options.collapse ? collapseWhitespace(element) : element,
-          options.stylesheets,
-          options.renderers,
-          undefined,
-          index
-        );
+  const parentIsInline = parentTag && isText[parentTag];
+
+  const renderedBuckets: (RenderedContent[] | RenderedContent)[] = buckets.map(
+    (bucket, bucketIndex) => {
+      if ((bucket.content.length === 1 && bucket.hasBlock) || parentIsInline) {
+        return renderBucketElement(bucket.content[0], options, bucketIndex);
       }
-      return renderElement(
-        element,
-        options.stylesheets,
-        options.renderers,
-        renderElements(
-          element.content,
-          element.tag === 'pre' ? { ...options, collapse: false } : options,
-          element.tag
-        ),
-        index
+      let rendered: RenderedContent | RenderedContent[] = bucket.content.map(
+        (element, index) => {
+          return renderBucketElement(element, options, index);
+        }
       );
-    });
-    const parentIsInline = parentTag && isText[parentTag];
-    return bucket.hasBlock || parentIsInline ? (
-      <React.Fragment key={bucketIndex}>{rendered}</React.Fragment>
-    ) : (
-      <Text key={bucketIndex}>{rendered}</Text>
-    );
-  });
+      if (rendered.length === 1) {
+        rendered = rendered[0];
+      }
+
+      if (bucket.hasBlock || parentIsInline) {
+        return buckets.length === 1 ? (
+          rendered
+        ) : (
+          <React.Fragment key={bucketIndex}>{rendered}</React.Fragment>
+        );
+      } else {
+        return <Text key={bucketIndex}>{rendered}</Text>;
+      }
+    }
+  );
+
+  return buckets.length === 1
+    ? (renderedBuckets[0] as RenderedContent)
+    : (renderedBuckets as RenderedContent[]);
 };
 
 export const applyStylesheets = (

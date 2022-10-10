@@ -6,9 +6,9 @@ import { HtmlStyle } from './styles';
 
 export const renderNoop: HtmlRenderer = ({ children }) => <></>;
 
-export const renderPassThrough: HtmlRenderer = ({ children }) => (
-  <>{children}</>
-);
+export const renderPassThrough: React.FC<React.PropsWithChildren<any>> = ({
+  children,
+}) => children;
 
 export const renderBlock: HtmlRenderer = ({ style, children }) => (
   <View style={style}>{children}</View>
@@ -108,7 +108,7 @@ const renderers: HtmlRenderers = {
     return (
       <View style={style}>
         {bullet && <View style={bulletStyles}>{bullet}</View>}
-        <Text style={contentStyles}>{children}</Text>
+        <View style={contentStyles}>{children}</View>
       </View>
     );
   },
