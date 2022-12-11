@@ -2,7 +2,7 @@ import React, { ReactElement } from 'react';
 import renderers, { renderBlock, renderInline, renderNoop } from './renderers';
 import { Text, View } from '@react-pdf/renderer';
 import parseHtml, { HtmlContent, HtmlElement } from './parse';
-import { createHtmlStylesheet, HtmlStyles } from './styles';
+import { createHtmlStylesheet, HtmlStyle, HtmlStyles } from './styles';
 import { Style } from '@react-pdf/types';
 import { isText, Tag } from './tags';
 
@@ -49,13 +49,22 @@ const convertEntities = (input: string) => {
   return text;
 };
 
+export const isBlockStyle = (style: HtmlStyle) =>
+  ['block', 'flex'].includes(style.display);
+
 export const hasBlockContent = (element: HtmlElement | string): boolean => {
   if (typeof element === 'string') {
     return false;
   }
-  if (isText[element.tag]) {
+
+  if (element.tag === 'a' || isText[element.tag]) {
+    if (element.style?.some(isBlockStyle)) {
+      return true;
+    }
+
+    // anchor tags match their content
     if (element.content) {
-      return element.content.findIndex(hasBlockContent) !== -1;
+      return element.content.some(hasBlockContent);
     }
     return false;
   }
@@ -191,24 +200,34 @@ export const renderBucketElement = (
     renderElements(
       element.content,
       element.tag === 'pre' ? { ...options, collapse: false } : options,
-      element.tag
+      element
     ),
     index
   );
 };
 
+const isAnchor = (content: HtmlContent | HtmlElement): boolean => {
+  return Array.isArray(content)
+    ? content.length === 1 &&
+        typeof content[0] !== 'string' &&
+        content[0].tag === 'a'
+    : content.tag === 'a';
+};
+
 export const renderElements = (
   elements: HtmlContent,
   options: HtmlRenderOptions,
-  parentTag?: Tag | string
+  parent?: HtmlElement
 ): RenderedContent | RenderedContent[] => {
-  const buckets = bucketElements(elements, options.collapse, parentTag);
-  const parentIsInline = parentTag && isText[parentTag];
+  const buckets = bucketElements(elements, options.collapse, parent?.tag);
+  const parentIsText = parent && !isAnchor(parent) && !hasBlockContent(parent);
 
   const renderedBuckets: (RenderedContent[] | RenderedContent)[] = buckets.map(
     (bucket, bucketIndex) => {
-      const wrapWithText = !bucket.hasBlock && !parentIsInline;
+      const wrapWithText =
+        !bucket.hasBlock && !parentIsText && !isAnchor(bucket.content);
 
+      // Avoid extra array
       if (bucket.content.length === 1 && !wrapWithText) {
         return renderBucketElement(bucket.content[0], options, bucketIndex);
       }
@@ -218,22 +237,25 @@ export const renderElements = (
           return renderBucketElement(element, options, index);
         }
       );
+
+      // unwrap extra array
       if (rendered.length === 1) {
         rendered = rendered[0];
       }
 
-      if (!wrapWithText) {
+      if (wrapWithText) {
+        return <Text key={bucketIndex}>{rendered}</Text>;
+      } else {
         return buckets.length === 1 ? (
           rendered
         ) : (
           <React.Fragment key={bucketIndex}>{rendered}</React.Fragment>
         );
-      } else {
-        return <Text key={bucketIndex}>{rendered}</Text>;
       }
     }
   );
 
+  // unwrap extra array
   return buckets.length === 1
     ? (renderedBuckets[0] as RenderedContent)
     : (renderedBuckets as RenderedContent[]);

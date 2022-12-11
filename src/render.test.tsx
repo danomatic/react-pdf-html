@@ -120,6 +120,22 @@ describe('render', () => {
       expect(hasBlockContent(inlineElementWithBlockContent)).toBe(true);
     });
 
+    it('Should return true for anchor elements with block content', () => {
+      const anchorWithBlockContent: HtmlElement = {
+        tag: 'a' as any,
+        content: [blockElement],
+      } as HtmlElement;
+      expect(hasBlockContent(anchorWithBlockContent)).toBe(true);
+    });
+
+    it('Should return false for anchor elements with inline content', () => {
+      const anchorWithInlineContent: HtmlElement = {
+        tag: 'a' as any,
+        content: [inlineElement],
+      } as HtmlElement;
+      expect(hasBlockContent(anchorWithInlineContent)).toBe(false);
+    });
+
     it('Should return false for inline elements with inline content', () => {
       const inlineElementWithBlockContent: HtmlElement = {
         tag: 'span' as any,
@@ -170,6 +186,57 @@ describe('render', () => {
       const pText = p.props.children;
       expect(pText.type).toBe(Text);
       expect(pText.props.children.length).toBe(8);
+    });
+
+    it('Should render anchors as inline if their content is inline', () => {
+      const html = `<p>Link to <a href="//www.google.com">Google</a> using react-pdf-html.</p>`;
+      const rootView = renderHtml(html);
+      expect(rootView.type).toBe(View);
+
+      const p = rootView.props.children;
+      expect(p.props.element.tag).toBe('p');
+      expect(p.type).toBe(renderBlock);
+
+      const pText = p.props.children;
+      expect(pText.type).toBe(Text);
+      expect(pText.props.children.length).toBe(3);
+
+      expect(pText.props.children[0]).toBe('Link to ');
+
+      const anchor = pText.props.children[1];
+      expect(anchor.props.element.tag).toBe('a');
+
+      const anchorText = anchor.props.children;
+      expect(anchorText.type).toBe(Text);
+      expect(anchorText.props.children).toBe('Google');
+
+      expect(pText.props.children[2]).toBe(' using react-pdf-html.');
+    });
+
+    it('Should render span as block style suggests it is block', () => {
+      const html = `<p>Expecting <span style="display: block">block text!</span> to render correctly</p>`;
+      const rootView = renderHtml(html);
+      expect(rootView.type).toBe(View);
+
+      const p = rootView.props.children;
+      expect(p.props.element.tag).toBe('p');
+      expect(p.type).toBe(renderBlock);
+      expect(p.props.children.length).toBe(3);
+
+      const pText1 = p.props.children[0];
+      expect(pText1.type).toBe(Text);
+      expect(pText1.props.children).toBe('Expecting');
+
+      const blockSpan = p.props.children[1];
+      expect(blockSpan.props.element.tag).toBe('span');
+      expect(blockSpan.type).toBe(renderBlock);
+      const spanText = blockSpan.props.children;
+      expect(spanText.type).toBe(Text);
+      expect(spanText.props.children).toBe('block text!');
+
+      const pText2 = p.props.children[2];
+      expect(pText2.type).toBe(Text);
+      expect(pText2.props.children).toBe('to render correctly');
     });
 
     it('Should render a PDF with custom font without errors', async () => {
