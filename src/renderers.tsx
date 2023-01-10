@@ -3,6 +3,7 @@ import { Link, Text, View, Image } from '@react-pdf/renderer';
 import { HtmlRenderer, HtmlRenderers } from './render';
 import { HtmlElement } from './parse';
 import { HtmlStyle } from './styles';
+import { lowerAlpha, orderedAlpha, upperAlpha } from './ordered.type';
 
 export const renderNoop: HtmlRenderer = ({ children }) => <></>;
 
@@ -96,7 +97,17 @@ const renderers: HtmlRenderers = {
         />
       );
     } else if (ordered) {
-      bullet = <Text>{element.indexOfType + 1}.</Text>;
+      if (lowerAlpha.includes(listStyleType)) {
+        bullet = (
+          <Text>{orderedAlpha[element.indexOfType].toLowerCase()}.</Text>
+        );
+      } else if (upperAlpha.includes(listStyleType)) {
+        bullet = (
+          <Text>{orderedAlpha[element.indexOfType].toUpperCase()}.</Text>
+        );
+      } else {
+        bullet = <Text>{element.indexOfType + 1}.</Text>;
+      }
     } else {
       // if (listStyleType.includes('square')) {
       //   bullet = <Text>■</Text>;

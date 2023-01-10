@@ -1,0 +1,31 @@
+export const orderedAlpha = [
+  'a',
+  'b',
+  'c',
+  'd',
+  'e',
+  'f',
+  'g',
+  'h',
+  'i',
+  'j',
+  'k',
+  'l',
+  'n',
+  'm',
+  'o',
+  'p',
+  'q',
+  'r',
+  's',
+  't',
+  'u',
+  'v',
+  'w',
+  'x',
+  'y',
+  'z',
+];
+
+export const lowerAlpha = ['lower-alpha', 'lower-latin'];
+export const upperAlpha = ['upper-alpha', 'upper-latin'];
