@@ -87,8 +87,6 @@ const renderers: HtmlRenderers = {
       listStyle.listStyle ||
       '';
 
-    console.log('ROBY LOG : ', listStyleType.includes('lower-alpha'));
-
     let bullet;
     if (listStyleType.includes('none')) {
       bullet = false;
