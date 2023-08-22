@@ -57,6 +57,7 @@ export type Tag =
 export const isText: Record<Tag, boolean> & Record<string, boolean> = {
   html: false,
   body: false,
+  style: false,
   h1: false,
   h2: false,
   h3: false,

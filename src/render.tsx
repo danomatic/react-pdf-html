@@ -75,6 +75,11 @@ export const hasBlockContent = (element: HtmlElement | string): boolean => {
 const ltrim = (text: string): string => text.replace(/^\s+/, '');
 const rtrim = (text: string): string => text.replace(/\s+$/, '');
 
+const isCustomElement = (element?: HtmlElement | string): boolean => {
+  if (!element || typeof element === 'string') return false;
+  return isText[element.tag] === undefined;
+}
+
 /**
  * Groups all block and non-block elements into buckets so that all non-block elements can be rendered in a parent Text element
  * @param elements Elements to place in buckets of block and non-block content
@@ -101,12 +106,17 @@ export const bucketElements = (
             element = element.substr(0, element.length - 1);
           }
         } else {
-          if (hasBlock || hasBlock === undefined) {
+          const isBucketCustomElement = isCustomElement(bucket?.content[0]);
+          if (!isBucketCustomElement && (hasBlock || hasBlock === undefined)) {
             element = ltrim(element);
           }
           const next = elements[index + 1];
-          if (next && hasBlockContent(next)) {
-            element = rtrim(element);
+          
+          if (next) {
+            const isNextCustomElement = isCustomElement(next);
+            if (hasBlockContent(next) && !isNextCustomElement) {
+              element = rtrim(element);
+            }
           }
         }
       }
@@ -115,7 +125,7 @@ export const bucketElements = (
       }
     }
     const block = hasBlockContent(element);
-    if (block !== hasBlock) {
+    if (block !== hasBlock || isCustomElement(element)) {
       hasBlock = block;
       bucket = {
         hasBlock,
