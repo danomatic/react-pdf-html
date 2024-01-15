@@ -241,3 +241,23 @@ return (
 ```
 
 If this is not defined, it falls back to a default of `18`
+
+## Fonts for bold, italic, etc.
+
+Please note that `react-pdf` has some constraints with how fonts are applied. You must provide a different font file for each combination of bold, italic, etc. For example:
+
+```ts
+Font.register({
+  family: 'OpenSans',
+  fonts: [
+    { src: fonts + '/Open_Sans/OpenSans-Regular.ttf' },
+    { src: fonts + '/Open_Sans/OpenSans-Bold.ttf', fontWeight: 'bold' },
+    { src: fonts + '/Open_Sans/OpenSans-Italic.ttf', fontStyle: 'italic' },
+    {
+      src: fonts + '/Open_Sans/OpenSans-BoldItalic.ttf',
+      fontWeight: 'bold',
+      fontStyle: 'italic',
+    },
+  ],
+});
+```
