@@ -244,7 +244,7 @@ If this is not defined, it falls back to a default of `18`
 
 ## Fonts for bold, italic, etc.
 
-Please note that `react-pdf` has some constraints with how fonts are applied. You must provide a different font file for each combination of bold, italic, etc. For example:
+Please note that `react-pdf` has some constraints with how fonts are applied (see https://react-pdf.org/fonts). You must provide a different font file for each combination of bold, italic, etc. For example:
 
 ```ts
 Font.register({
