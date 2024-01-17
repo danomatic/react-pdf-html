@@ -162,9 +162,10 @@ export const createHtmlStylesheet = <T extends HtmlStyles>(
     for (const key of Object.keys(base)) {
       for (const style of Object.keys(base[key])) {
         if (
-          style.startsWith('margin') ||
-          style.startsWith('padding') ||
-          style === 'fontSize'
+          !key.startsWith('li_') &&
+          (style.startsWith('margin') ||
+            style.startsWith('padding') ||
+            style === 'fontSize')
         ) {
           delete (base as any)[key][style];
         }
