@@ -188,6 +188,18 @@ describe('render', () => {
       expect(pText.props.children.length).toBe(8);
     });
 
+    it('Should render keep spaces around custom elements', () => {
+      const html = `<p>Paragraph with <CustomElement /> between text</p>`;
+      const rootView = renderHtml(html, {
+        renderers: {
+          customelement: () => <View />,
+        }
+      });
+      const p = rootView.props.children.props.children;
+      expect(p[0].props.children).toBe('Paragraph with ');
+      expect(p[2].props.children).toBe(' between text');
+    });
+
     it('Should render anchors as inline if their content is inline', () => {
       const html = `<p>Link to <a href="//www.google.com">Google</a> using react-pdf-html.</p>`;
       const rootView = renderHtml(html);
