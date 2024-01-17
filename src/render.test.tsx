@@ -35,6 +35,7 @@ import renderers, {
   renderNoop,
   renderPassThrough,
 } from './renderers';
+import exp from 'constants';
 
 const inlineElement: HtmlElement = {
   tag: 'span',
@@ -193,7 +194,7 @@ describe('render', () => {
       const rootView = renderHtml(html, {
         renderers: {
           customelement: () => <View />,
-        }
+        },
       });
       const p = rootView.props.children.props.children;
       expect(p[0].props.children).toBe('Paragraph with ');
@@ -249,6 +250,78 @@ describe('render', () => {
       const pText2 = p.props.children[2];
       expect(pText2.type).toBe(Text);
       expect(pText2.props.children).toBe('to render correctly');
+    });
+
+    it('Should apply background-color to child elements', () => {
+      const content = `
+<style>
+.highlightClass {
+  background-color: #ffff00;
+}
+</style>
+<p><span class="highlightClass"><span style="color: blue;">Blue text</span></span></p>
+`;
+
+      const rootView = renderHtml(content);
+      scrub(rootView);
+
+      expect(rootView.type).toBe(View);
+      expect(rootView.props.children.length).toBe(2);
+
+      const p = rootView.props.children[1];
+      expect(p.props.element.tag).toBe('p');
+
+      const span = p.props.children;
+      expect(span.props.element.tag).toBe('span');
+      expect(span.props.style).toEqual([
+        {
+          backgroundColor: '#ffff00',
+        },
+      ]);
+    });
+
+    it('Should wrap a string child of a block element', () => {
+      const content = `
+<p>Text block</p>
+`;
+
+      const rootView = renderHtml(content);
+      scrub(rootView);
+
+      expect(rootView.type).toBe(View);
+
+      const p = rootView.props.children;
+      expect(p.props.element.tag).toBe('p');
+
+      const text = p.props.children;
+      expect(text.type).toBe(Text);
+
+      const string = text.props.children;
+      expect(string).toBe('Text block');
+    });
+
+    it('Should wrap mixed inline child elements', () => {
+      const content = `
+<p>Text block<span>and more</span></p>
+`;
+
+      const rootView = renderHtml(content);
+      scrub(rootView);
+
+      expect(rootView.type).toBe(View);
+
+      const p = rootView.props.children;
+      expect(p.props.element.tag).toBe('p');
+
+      const text = p.props.children;
+      expect(text.type).toBe(Text);
+
+      const string = text.props.children[0];
+      expect(string).toBe('Text block');
+
+      const span = text.props.children[1];
+      expect(span.props.element.tag).toBe('span');
+      expect(span.props.children).toBe('and more');
     });
 
     it('Should render a PDF with custom font without errors', async () => {

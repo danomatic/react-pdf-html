@@ -78,7 +78,7 @@ const rtrim = (text: string): string => text.replace(/\s+$/, '');
 const isCustomElement = (element?: HtmlElement | string): boolean => {
   if (!element || typeof element === 'string') return false;
   return isText[element.tag] === undefined;
-}
+};
 
 /**
  * Groups all block and non-block elements into buckets so that all non-block elements can be rendered in a parent Text element
@@ -111,7 +111,7 @@ export const bucketElements = (
             element = ltrim(element);
           }
           const next = elements[index + 1];
-          
+
           if (next) {
             const isNextCustomElement = isCustomElement(next);
             if (hasBlockContent(next) && !isNextCustomElement) {
@@ -235,7 +235,10 @@ export const renderElements = (
   const renderedBuckets: (RenderedContent[] | RenderedContent)[] = buckets.map(
     (bucket, bucketIndex) => {
       const wrapWithText =
-        !bucket.hasBlock && !parentIsText && !isAnchor(bucket.content);
+        !bucket.hasBlock &&
+        !parentIsText &&
+        !isAnchor(bucket.content) &&
+        (bucket.content.length > 1 || typeof bucket.content[0] === 'string');
 
       // Avoid extra array
       if (bucket.content.length === 1 && !wrapWithText) {
