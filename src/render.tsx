@@ -293,7 +293,7 @@ const renderHtml = (
   options: {
     collapse?: boolean;
     renderers?: HtmlRenderers;
-    style?: Style | (Style | undefined)[];
+    style?: Style | Style[];
     stylesheet?: HtmlStyles | HtmlStyles[];
     resetStyles?: boolean;
   } = {}
@@ -311,7 +311,7 @@ const renderHtml = (
       return;
     }
     if (typeof style.fontSize === 'number') {
-      fontSizeStyle.fontSize = style.fontSize as unknown as number;
+      fontSizeStyle.fontSize = style.fontSize;
     }
     if (typeof style.fontSize === 'string' && style.fontSize.endsWith('px')) {
       fontSizeStyle.fontSize = parseInt(style.fontSize, 10);
@@ -340,7 +340,7 @@ const renderHtml = (
   applyStylesheets(opts.stylesheets, parsed.rootElement);
 
   return (
-    <View style={{ ...styles, ...fontSizeStyle }}>
+    <View style={[...styles, fontSizeStyle]}>
       {renderElements(parsed.rootElement.content, opts)}
     </View>
   );
