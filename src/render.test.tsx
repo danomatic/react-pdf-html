@@ -147,6 +147,30 @@ describe('render', () => {
   });
 
   describe('renderHtml', () => {
+    it('Should correctly merge styles', () => {
+      const result1 = renderHtml('<p></p>', {
+        style: {
+          color: 'blue',
+        },
+      });
+      expect(result1.props.style).toEqual([
+        { color: 'blue' },
+        { fontSize: 18 },
+      ]);
+
+      const result2 = renderHtml('<p></p>', {
+        style: [
+          {
+            color: 'blue',
+          },
+        ],
+      });
+      expect(result2.props.style).toEqual([
+        { color: 'blue' },
+        { fontSize: 18 },
+      ]);
+    });
+
     it('Should use a custom renderer', () => {
       const foo = jest.fn();
 
