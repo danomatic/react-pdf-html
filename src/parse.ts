@@ -9,6 +9,7 @@ import { Tag } from './tags';
 import cssTree, { Block, Declaration, List, Rule, StyleSheet } from 'css-tree';
 import supportedStyles from './supportedStyles';
 import { HtmlStyle, HtmlStyles } from './styles';
+import remoteCss from './resolveCssFile';
 const camelize = require('camelize');
 
 export type HtmlContent = (HtmlElement | string)[];
@@ -151,11 +152,25 @@ const parseHtml = (
   text: string
 ): { stylesheets: HtmlStyles[]; rootElement: HtmlElement } => {
   const html = parse(text, { comment: false });
+
   const stylesheets = html
-    .querySelectorAll('style')
-    .map((styleNode) =>
-      styleNode.childNodes.map((textNode) => textNode.rawText.trim()).join('\n')
-    )
+    .querySelectorAll('style, link[rel="stylesheet"][href]')
+    .map((styleNode) => {
+      if (styleNode.tagName === 'STYLE') {
+        return styleNode.childNodes
+          .map((textNode) => textNode.rawText.trim())
+          .join('\n');
+      } else {
+        try {
+          return remoteCss(styleNode.getAttribute('href') as string);
+        } catch (e) {
+          console.error(
+            `Unable to get remote CSS file ${styleNode.getAttribute('href')}`,
+            e
+          );
+        }
+      }
+    })
     .filter((styleText) => !!styleText)
     .map(convertStylesheet);
   return {
