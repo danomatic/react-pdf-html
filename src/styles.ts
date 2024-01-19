@@ -122,6 +122,7 @@ export const createHtmlStylesheet = <T extends HtmlStyles>(
     li_content: {
       textAlign: 'left',
       flexGrow: 1,
+      flexBasis: 1,
     },
     table: {
       display: 'flex',
