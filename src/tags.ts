@@ -51,7 +51,24 @@ export type Tag =
   | 'td'
   | 'th'
   | 'thead'
-  | 'tbody';
+  | 'tbody'
+  | 'svg'
+  | 'line'
+  | 'path'
+  | 'polyline'
+  | 'polygon'
+  | 'path'
+  | 'rect'
+  | 'circle'
+  | 'ellipse'
+  | 'text'
+  | 'tspan'
+  | 'g'
+  | 'stop'
+  | 'defs'
+  | 'clipPath'
+  | 'linearGradient'
+  | 'radialGradient';
 
 // Is the element rendered as a "Text" tag
 export const isText: Record<Tag, boolean> & Record<string, boolean> = {
@@ -114,4 +131,21 @@ export const isText: Record<Tag, boolean> & Record<string, boolean> = {
   dd: false,
   dl: false,
   dt: false,
+
+  svg: false,
+  line: false,
+  polyline: false,
+  polygon: false,
+  path: false,
+  rect: false,
+  circle: false,
+  ellipse: false,
+  text: false,
+  tspan: false,
+  g: false,
+  stop: false,
+  defs: false,
+  clipPath: false,
+  linearGradient: false,
+  radialGradient: false,
 };

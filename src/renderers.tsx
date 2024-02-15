@@ -1,15 +1,81 @@
 import React from 'react';
-import { Link, Text, View, Image } from '@react-pdf/renderer';
-import { HtmlRenderer, HtmlRenderers } from './render';
+import {
+  Link,
+  Text,
+  View,
+  Image,
+  Svg,
+  Path,
+  Polyline,
+  Line,
+  Polygon,
+  G,
+  Tspan,
+  Ellipse,
+  Circle,
+  Rect,
+  Stop,
+  Defs,
+  ClipPath,
+  LinearGradient,
+  RadialGradient,
+} from '@react-pdf/renderer';
+import { HtmlRenderer, HtmlRenderers, WrapperRenderer } from './render';
 import { HtmlElement } from './parse';
 import { HtmlStyle } from './styles';
 import { lowerAlpha, orderedAlpha, upperAlpha } from './ordered.type';
+import { Style } from '@react-pdf/types';
 
 export const renderNoop: HtmlRenderer = ({ children }) => <></>;
 
 export const renderPassThrough: React.FC<React.PropsWithChildren<any>> = ({
   children,
 }) => children;
+
+const svgAttributes: Record<string, string> = {
+  'stop-color': 'stopColor',
+  'stop-opacity': 'stopOpacity',
+  'dominant-baseline': 'dominantBaseline',
+  'fill-opacity': 'fillOpacity',
+  'fill-rule': 'fillRule',
+  'stroke-width': 'strokeWidth',
+  'stroke-opacity': 'strokeOpacity',
+  'stroke-linecap': 'strokeLinecap',
+  'stroke-linejoin': 'strokeLinejoin',
+  'stroke-dasharray': 'strokeDasharray',
+  'text-anchor': 'textAnchor',
+  'clip-path': 'clipPath',
+};
+const convertSvgAttributes = (
+  attrs: Record<string, string>
+): Record<string, string> => {
+  const result: Record<string, string> = {};
+
+  for (const key in attrs) {
+    const newKey = svgAttributes[key] || key;
+    result[newKey] = attrs[key];
+  }
+
+  return result;
+};
+
+const convertSvgStyles = (stylesTags: Style[]): Style => {
+  return stylesTags.reduce((acc, cur) => ({ ...acc, ...cur }), {});
+};
+
+export const renderSvgs: WrapperRenderer = (
+  Wrapper,
+  { element, style, children }
+) => {
+  return (
+    <Wrapper
+      {...convertSvgAttributes(element?.attributes)}
+      {...convertSvgStyles(style)}
+    >
+      {children}
+    </Wrapper>
+  );
+};
 
 export const renderBlock: HtmlRenderer = ({ style, children }) => (
   <View style={style}>{children}</View>
@@ -159,6 +225,22 @@ const renderers: HtmlRenderers = {
   ),
   td: renderCell,
   th: renderCell,
+  svg: renderSvgs.bind(null, Svg),
+  line: renderSvgs.bind(null, Line),
+  polyline: renderSvgs.bind(null, Polyline),
+  polygon: renderSvgs.bind(null, Polygon),
+  path: renderSvgs.bind(null, Path),
+  rect: renderSvgs.bind(null, Rect),
+  circle: renderSvgs.bind(null, Circle),
+  ellipse: renderSvgs.bind(null, Ellipse),
+  text: renderSvgs.bind(null, Text),
+  tspan: renderSvgs.bind(null, Tspan),
+  g: renderSvgs.bind(null, G),
+  stop: renderSvgs.bind(null, Stop),
+  defs: renderSvgs.bind(null, Defs),
+  clippath: renderSvgs.bind(null, ClipPath),
+  lineargradient: renderSvgs.bind(null, LinearGradient),
+  radialgradient: renderSvgs.bind(null, RadialGradient),
 };
 
 export default renderers;
