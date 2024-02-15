@@ -231,26 +231,24 @@ const isAnchor = (content: HtmlContent | HtmlElement): boolean => {
 };
 
 const isSvgText = (content: HtmlElement | undefined): boolean => {
-  return (
-    [
-      'svg',
-      'line',
-      'polyline',
-      'polygon',
-      'path',
-      'rect',
-      'circle',
-      'ellipse',
-      'text',
-      'tspan',
-      'g',
-      'stop',
-      'defs',
-      'clippath',
-      'lineargradient',
-      'radialgradient',
-    ].indexOf(content?.tag || '') > -1
-  );
+  return [
+    'svg',
+    'line',
+    'polyline',
+    'polygon',
+    'path',
+    'rect',
+    'circle',
+    'ellipse',
+    'text',
+    'tspan',
+    'g',
+    'stop',
+    'defs',
+    'clippath',
+    'lineargradient',
+    'radialgradient',
+  ].includes(content?.tag || '');
 };
 
 export const renderElements = (

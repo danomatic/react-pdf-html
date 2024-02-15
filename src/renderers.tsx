@@ -25,6 +25,7 @@ import { HtmlElement } from './parse';
 import { HtmlStyle } from './styles';
 import { lowerAlpha, orderedAlpha, upperAlpha } from './ordered.type';
 import { Style } from '@react-pdf/types';
+const camelize = require('camelize');
 
 export const renderNoop: HtmlRenderer = ({ children }) => <></>;
 
@@ -32,28 +33,13 @@ export const renderPassThrough: React.FC<React.PropsWithChildren<any>> = ({
   children,
 }) => children;
 
-const svgAttributes: Record<string, string> = {
-  'stop-color': 'stopColor',
-  'stop-opacity': 'stopOpacity',
-  'dominant-baseline': 'dominantBaseline',
-  'fill-opacity': 'fillOpacity',
-  'fill-rule': 'fillRule',
-  'stroke-width': 'strokeWidth',
-  'stroke-opacity': 'strokeOpacity',
-  'stroke-linecap': 'strokeLinecap',
-  'stroke-linejoin': 'strokeLinejoin',
-  'stroke-dasharray': 'strokeDasharray',
-  'text-anchor': 'textAnchor',
-  'clip-path': 'clipPath',
-};
 const convertSvgAttributes = (
   attrs: Record<string, string>
 ): Record<string, string> => {
   const result: Record<string, string> = {};
 
   for (const key in attrs) {
-    const newKey = svgAttributes[key] || key;
-    result[newKey] = attrs[key];
+    result[camelize(key)] = attrs[key];
   }
 
   return result;
