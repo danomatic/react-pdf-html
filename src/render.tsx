@@ -6,18 +6,18 @@ import { createHtmlStylesheet, HtmlStyle, HtmlStyles } from './styles';
 import { Style } from '@react-pdf/types';
 import { isText, Tag } from './tags';
 
-export type BaseHtmlRenderer = {
+export type HtmlRendererProps = {
   element: HtmlElement;
   style: Style[];
   children: React.ReactNode;
   stylesheets: HtmlStyles[];
 };
 
-export type HtmlRenderer = React.FC<React.PropsWithChildren<BaseHtmlRenderer>>;
+export type HtmlRenderer = React.FC<React.PropsWithChildren<HtmlRendererProps>>;
 
 export type WrapperRenderer = (
   Wrapper: React.ElementType,
-  renderer: BaseHtmlRenderer
+  renderer: HtmlRendererProps
 ) => React.ReactElement;
 
 export type HtmlRenderers = Record<Tag | string, HtmlRenderer>;
