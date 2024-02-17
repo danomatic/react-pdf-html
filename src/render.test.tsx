@@ -451,4 +451,155 @@ describe('render', () => {
       }
     });
   });
+
+  it('Should render a PDF with an svg without errors', async () => {
+    const content = `<html>
+      <body>
+        <svg xmlns="http://www.w3.org/2000/svg" width="500" height="300">
+          <defs>
+            <linearGradient id="linearGrad" x1="0%" y1="50%" x2="100%" y2="50%">
+              <stop offset="0%" stop-color="red" stop-opacity="1" />
+              <stop offset="100%" style="stop-color:yellow;stop-opacity:1" />
+            </linearGradient>
+
+            <radialGradient id="radialGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" style="stop-color:orange;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:blue;stop-opacity:1" />
+            </radialGradient>
+
+            <clipPath id="starClip">
+              <polygon points="100,10 40,198 190,78 10,78 160,198" />
+            </clipPath> 
+          </defs>
+
+          <rect width="100%" height="100%" fill="url(#linearGrad)" />
+
+          <line x1="30" y1="80" x2="200" y2="250" stroke="black" stroke-width="3" />
+          <polyline points="220,50 280,80 250,150 300,200" fill="none" stroke="green" stroke-width="3" />
+          <polygon points="320,80 340,140 400,120" fill="url(#radialGrad)" /> 
+          <path d="M420,50 C480,80 450,200 400,240" stroke="purple" stroke-width="4" fill="none"/>
+
+          <rect x="230" y="160" width="60" height="30" fill="lightblue" stroke="black" />
+          <circle cx="360" cy="220" r="20" fill="pink" />
+          <ellipse cx="430" cy="260" rx="30" ry="15" fill="brown" />
+
+          <text x="60" y="60" font-size="24">SVG Shapes</text>
+          <text x="90" y="120">
+            <tspan>Multiline</tspan>
+            <tspan x="90" dy="20">Text</tspan> 
+          </text>
+
+          <g clip-path="url(#starClip)">
+            <circle cx="100" cy="100" r="80" fill="#f0f" stroke="black" stroke-width="3" />
+          </g>
+        </svg>
+      </body>
+    </html>`;
+
+    const rootView = renderHtml(content);
+    expect(rootView.type).toBe(View);
+
+    const html = rootView.props.children;
+    expect(html.type).toBe(renderPassThrough);
+
+    const body = html.props.children;
+    expect(body.type).toBe(renderBlock);
+    expect(body.props.element.tag).toBe('body');
+
+    const svg = body.props.children;
+    expect(svg.props.element.tag).toBe('svg');
+    expect(svg.props.element.attributes).toStrictEqual({
+      height: '300',
+      width: '500',
+      xmlns: 'http://www.w3.org/2000/svg',
+    });
+
+    const defs = svg.props.children[0];
+    expect(defs.props.element.tag).toBe('defs');
+    expect(defs.props.element.attributes).toStrictEqual({});
+
+    const linearGradient = defs.props.children[0];
+    expect(linearGradient.props.element.tag).toBe('lineargradient');
+    expect(linearGradient.props.element.attributes).toStrictEqual({
+      id: 'linearGrad',
+      x1: '0%',
+      x2: '100%',
+      y1: '50%',
+      y2: '50%',
+    });
+
+    const lStop1 = linearGradient.props.children[0];
+    expect(lStop1.props.element.tag).toBe('stop');
+    expect(lStop1.props.element.attributes).toStrictEqual({
+      offset: '0%',
+      'stop-color': 'red',
+      'stop-opacity': '1',
+    });
+
+    const lStop2 = linearGradient.props.children[1];
+    expect(lStop2.props.element.tag).toBe('stop');
+    expect(lStop2.props.element.attributes).toStrictEqual({
+      offset: '100%',
+      style: 'stop-color:yellow;stop-opacity:1',
+    });
+
+    const radialGradient = defs.props.children[2];
+    expect(radialGradient.props.element.tag).toBe('radialgradient');
+
+    const rStop1 = radialGradient.props.children[0];
+    expect(rStop1.props.element.tag).toBe('stop');
+
+    const rStop2 = radialGradient.props.children[1];
+    expect(rStop2.props.element.tag).toBe('stop');
+
+    const clipPath = defs.props.children[4];
+    expect(clipPath.props.element.tag).toBe('clippath');
+    const polygonClip = clipPath.props.children;
+    expect(polygonClip.props.element.tag).toBe('polygon');
+
+    const rect = svg.props.children[1];
+    expect(rect.props.element.tag).toBe('rect');
+    const line = svg.props.children[2];
+    expect(line.props.element.tag).toBe('line');
+    const polyline = svg.props.children[3];
+    expect(polyline.props.element.tag).toBe('polyline');
+    const polygon = svg.props.children[4];
+    expect(polygon.props.element.tag).toBe('polygon');
+    const path = svg.props.children[5];
+    expect(path.props.element.tag).toBe('path');
+    const rect2 = svg.props.children[6];
+    expect(rect2.props.element.tag).toBe('rect');
+    const circle = svg.props.children[7];
+    expect(circle.props.element.tag).toBe('circle');
+    const ellipse = svg.props.children[8];
+    expect(ellipse.props.element.tag).toBe('ellipse');
+    const text = svg.props.children[9];
+    expect(text.props.element.tag).toBe('text');
+
+    const textMulti = svg.props.children[10];
+    expect(textMulti.props.element.tag).toBe('text');
+    const tspan1 = textMulti.props.children[0];
+    expect(tspan1.props.element.tag).toBe('tspan');
+    const tspan2 = textMulti.props.children[1];
+    expect(tspan2.props.element.tag).toBe('tspan');
+
+    const g = svg.props.children[11];
+    expect(g.props.element.tag).toBe('g');
+    const gCircle = g.props.children;
+    expect(gCircle.props.element.tag).toBe('circle');
+
+    const document = (
+      <Document>
+        <Page size="LETTER">
+          <>{rootView}</>
+        </Page>
+      </Document>
+    );
+
+    try {
+      const pdfString = await renderToString(document);
+    } catch (e) {
+      fail(e);
+    }
+  });
 });

@@ -6,13 +6,19 @@ import { createHtmlStylesheet, HtmlStyle, HtmlStyles } from './styles';
 import { Style } from '@react-pdf/types';
 import { isText, Tag } from './tags';
 
-export type HtmlRenderer = React.FC<
-  React.PropsWithChildren<{
-    element: HtmlElement;
-    style: Style[];
-    stylesheets: HtmlStyles[];
-  }>
->;
+export type HtmlRendererProps = {
+  element: HtmlElement;
+  style: Style[];
+  children: React.ReactNode;
+  stylesheets: HtmlStyles[];
+};
+
+export type HtmlRenderer = React.FC<React.PropsWithChildren<HtmlRendererProps>>;
+
+export type WrapperRenderer = (
+  Wrapper: React.ElementType,
+  renderer: HtmlRendererProps
+) => React.ReactElement;
 
 export type HtmlRenderers = Record<Tag | string, HtmlRenderer>;
 
@@ -224,13 +230,36 @@ const isAnchor = (content: HtmlContent | HtmlElement): boolean => {
     : content.tag === 'a';
 };
 
+const isSvgText = (content: HtmlElement | undefined): boolean => {
+  return [
+    'svg',
+    'line',
+    'polyline',
+    'polygon',
+    'path',
+    'rect',
+    'circle',
+    'ellipse',
+    'text',
+    'tspan',
+    'g',
+    'stop',
+    'defs',
+    'clippath',
+    'lineargradient',
+    'radialgradient',
+  ].includes(content?.tag || '');
+};
+
 export const renderElements = (
   elements: HtmlContent,
   options: HtmlRenderOptions,
   parent?: HtmlElement
 ): RenderedContent | RenderedContent[] => {
   const buckets = bucketElements(elements, options.collapse, parent?.tag);
-  const parentIsText = parent && !isAnchor(parent) && !hasBlockContent(parent);
+  const parentIsText =
+    (parent && !isAnchor(parent) && !hasBlockContent(parent)) ||
+    isSvgText(parent);
 
   const renderedBuckets: (RenderedContent[] | RenderedContent)[] = buckets.map(
     (bucket, bucketIndex) => {
