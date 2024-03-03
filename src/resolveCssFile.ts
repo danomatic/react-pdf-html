@@ -1,7 +1,12 @@
-import fs from 'fs';
-import url from 'url';
-import path from 'path';
+// @ts-ignore
+const fs = require('fs');
+// @ts-ignore
+const url = require('url');
+// @ts-ignore
+const path = require('path');
 import fetch from 'sync-fetch';
+
+const isBrowser = !fs || !url || !path;
 
 const createCache = ({ limit = 100 } = {}) => {
   let cache: Record<string, any> = {};
@@ -27,9 +32,10 @@ const createCache = ({ limit = 100 } = {}) => {
 export const CSS_CACHE = createCache({ limit: 30 });
 
 const getAbsoluteLocalPath = (src: string) => {
-  // if (BROWSER) {
-  //   throw new Error('Cannot check local paths in client-side environment');
-  // }
+  if (isBrowser) {
+    // throw new Error('Cannot check local paths in client-side environment');
+    return undefined;
+  }
 
   const {
     protocol,
@@ -47,9 +53,9 @@ const getAbsoluteLocalPath = (src: string) => {
 };
 
 const fetchLocalFile = (src: string): string => {
-  // if (BROWSER) {
-  //   throw new Error('Cannot fetch local file in this environment');
-  // }
+  if (isBrowser) {
+    throw new Error('Cannot fetch local file in this environment');
+  }
 
   const absolutePath = getAbsoluteLocalPath(src);
   if (!absolutePath) {
@@ -71,7 +77,7 @@ const resolveImageFromUrl = (
   src: string,
   crossOrigin: 'anonymous' | 'use-credentials' = 'anonymous'
 ) => {
-  return getAbsoluteLocalPath(src)
+  return !isBrowser && getAbsoluteLocalPath(src)
     ? fetchLocalFile(src)
     : fetchRemoteFile(src, {
         method: 'GET',
