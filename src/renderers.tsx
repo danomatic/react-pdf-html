@@ -1,30 +1,31 @@
 import React from 'react';
 import {
-  Link,
-  Text,
-  View,
-  Image,
-  Svg,
-  Path,
-  Polyline,
-  Line,
-  Polygon,
-  G,
-  Tspan,
-  Ellipse,
   Circle,
+  ClipPath,
+  Defs,
+  Ellipse,
+  G,
+  Image,
+  Line,
+  LinearGradient,
+  Link,
+  Path,
+  Polygon,
+  Polyline,
+  RadialGradient,
   Rect,
   Stop,
-  Defs,
-  ClipPath,
-  LinearGradient,
-  RadialGradient,
+  Svg,
+  Text,
+  Tspan,
+  View,
 } from '@react-pdf/renderer';
 import { HtmlRenderer, HtmlRenderers, WrapperRenderer } from './render';
 import { HtmlElement } from './parse';
 import { HtmlStyle } from './styles';
 import { lowerAlpha, orderedAlpha, upperAlpha } from './ordered.type';
 import { Style } from '@react-pdf/types';
+
 const camelize = require('camelize');
 
 export const renderNoop: HtmlRenderer = ({ children }) => <></>;
@@ -181,7 +182,17 @@ const renderers: HtmlRenderers = {
     </Link>
   ),
   img: ({ style, element }) => (
-    <Image style={style} src={element.attributes.src} />
+    <Image
+      style={style}
+      source={{
+        uri: element.attributes.src,
+        body: null,
+        method: 'GET',
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
+      }}
+    />
   ),
   table: ({ element, style, children }) => {
     const tableStyles = element.style.reduce(
