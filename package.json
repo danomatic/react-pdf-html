@@ -12,11 +12,19 @@
   ],
   "license": "MIT",
   "repository": "https://github.com/danomatic/react-pdf-html",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "type": "module",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/mjs/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
+  "types": "dist/types/index.d.ts",
   "scripts": {
     "test": "NODE_ENV=test jest",
-    "build": "rm -rf dist && tsc -p .",
+    "build": "rm -rf dist && tsc -b ./tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
     "coverage": "NODE_ENV=test jest --coverage",
     "pretty-check": "prettier --check \"**/*.{js,ts,tsx,json,md}\"",
     "pretty": "prettier --write \"**/*.{js,ts,tsx,json,md}\""
