@@ -1,8 +1,24 @@
 // For a detailed explanation regarding each configuration property, visit:
 // https://jestjs.io/docs/en/configuration.html
-import type { Config } from 'jest';
+import type { JestConfigWithTsJest } from 'ts-jest';
 
-const config: Config = {
+const jestConfig: JestConfigWithTsJest = {
+  // ESM config
+  extensionsToTreatAsEsm: ['.ts'],
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+  },
+  transform: {
+    // '^.+\\.[tj]sx?$' to process js/ts with `ts-jest`
+    // '^.+\\.m?[tj]sx?$' to process js/ts/mjs/mts with `ts-jest`
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        useESM: true,
+      },
+    ],
+  },
+
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 
@@ -92,8 +108,10 @@ const config: Config = {
   // An enum that specifies notification mode. Requires { notify: true }
   // notifyMode: "failure-change",
 
-  // A preset that is used as a base for Jest's configuration
-  preset: 'ts-jest',
+  // A preset that is used as a base for Jest's configuration;
+  // https://kulshekhar.github.io/ts-jest/docs/guides/esm-support/#esm-presets
+  // If you are using custom transform config, please remove preset from your Jest config to avoid issues that Jest doesn't transform files correctly.
+  // preset: 'ts-jest',
 
   // Run tests from one or more projects
   // projects: undefined,
@@ -188,4 +206,4 @@ const config: Config = {
   // watchman: true,
 };
 
-export default config;
+export default jestConfig;
