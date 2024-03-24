@@ -20,12 +20,11 @@ import {
   Tspan,
   View,
 } from '@react-pdf/renderer';
-import { HtmlRenderer, HtmlRenderers, WrapperRenderer } from './render';
-import { HtmlElement } from './parse';
-import { HtmlStyle } from './styles';
+import { HtmlRenderer, HtmlRenderers, WrapperRenderer } from './render.js';
+import { HtmlElement } from './parse.js';
+import { HtmlStyle } from './styles.js';
 import { lowerAlpha, orderedAlpha, upperAlpha } from './ordered.type';
 import { Style } from '@react-pdf/types';
-
 import camelize from 'camelize';
 
 export const renderNoop: HtmlRenderer = ({ children }) => <></>;
