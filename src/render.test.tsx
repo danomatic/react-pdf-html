@@ -1,5 +1,5 @@
 import React, { ReactElement, ReactNode } from 'react';
-const stringify = require('json-stringify-safe');
+// const stringify = require('json-stringify-safe');
 import { HtmlContent, HtmlElement } from './parse';
 import renderHtml, {
   bucketElements,

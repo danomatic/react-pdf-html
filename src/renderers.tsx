@@ -25,8 +25,7 @@ import { HtmlElement } from './parse';
 import { HtmlStyle } from './styles';
 import { lowerAlpha, orderedAlpha, upperAlpha } from './ordered.type';
 import { Style } from '@react-pdf/types';
-
-const camelize = require('camelize');
+import camelize from 'camelize';
 
 export const renderNoop: HtmlRenderer = ({ children }) => <></>;
 

@@ -1,0 +1,9 @@
+// For CJS build
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist/cjs",
+    "module": "commonjs",
+    "target": "ES2015"
+  }
+}

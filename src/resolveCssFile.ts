@@ -1,9 +1,6 @@
-// @ts-ignore
-const fs = require('fs');
-// @ts-ignore
-const url = require('url');
-// @ts-ignore
-const path = require('path');
+import fs from 'fs';
+import url from 'url';
+import path from 'path';
 import fetch from 'sync-fetch';
 
 const isBrowser = !fs || !url || !path;
