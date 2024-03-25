@@ -1,15 +1,14 @@
 // For a detailed explanation regarding each configuration property, visit:
 // https://jestjs.io/docs/en/configuration.html
-import type { JestConfigWithTsJest } from 'ts-jest';
 
-const jestConfig: JestConfigWithTsJest = {
+module.exports = {
   // ESM config
-  extensionsToTreatAsEsm: ['.ts'],
-  moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1',
-  },
+  // extensionsToTreatAsEsm: ['.ts'],
+  // moduleNameMapper: {
+  //   '^(\\.{1,2}/.*)\\.js$': '$1',
+  // },
   transform: {
-    // '^.+\\.[tj]sx?$' to process js/ts with `ts-jest`
+    '^.+\\.[tj]sx?$': 'ts-jest', // to process js/ts with `ts-jest`
     // '^.+\\.m?[tj]sx?$' to process js/ts/mjs/mts with `ts-jest`
     '^.+\\.tsx?$': [
       'ts-jest',
@@ -189,9 +188,9 @@ const jestConfig: JestConfigWithTsJest = {
   // transform: undefined,
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-  // transformIgnorePatterns: [
-  //   "/node_modules/"
-  // ],
+  transformIgnorePatterns: [
+    "/node_modules/"
+  ],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
   // unmockedModulePathPatterns: undefined,
@@ -205,5 +204,3 @@ const jestConfig: JestConfigWithTsJest = {
   // Whether to use watchman for file crawling
   // watchman: true,
 };
-
-export default jestConfig;
