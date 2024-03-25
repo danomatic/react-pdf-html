@@ -1,6 +1,6 @@
 import { StyleSheet } from '@react-pdf/renderer';
 import { Style } from '@react-pdf/types';
-import { Tag } from './tags.js';
+import { Tag } from './tags';
 
 export type HtmlStyle =
   | (Style & {

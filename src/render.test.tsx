@@ -1,11 +1,11 @@
 import React, { ReactElement, ReactNode } from 'react';
 // const stringify = require('json-stringify-safe');
-import { HtmlContent, HtmlElement } from './parse.js';
+import { HtmlContent, HtmlElement } from './parse';
 import renderHtml, {
   bucketElements,
   collapseWhitespace,
   hasBlockContent,
-} from './render.js';
+} from './render';
 
 const scrub = (object: any) => {
   if (Array.isArray(object)) {

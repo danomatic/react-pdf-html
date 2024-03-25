@@ -5,11 +5,11 @@ import {
   parse,
   TextNode,
 } from 'node-html-parser';
-import { Tag } from './tags.js';
+import { Tag } from './tags';
 import cssTree, { Block, Declaration, List, Rule, StyleSheet } from 'css-tree';
-import supportedStyles from './supportedStyles.js';
-import { HtmlStyle, HtmlStyles } from './styles.js';
-import remoteCss from './resolveCssFile.js';
+import supportedStyles from './supportedStyles';
+import { HtmlStyle, HtmlStyles } from './styles';
+import remoteCss from './resolveCssFile';
 import camelize from 'camelize';
 
 export type HtmlContent = (HtmlElement | string)[];

@@ -2,7 +2,7 @@ import parseHtml, {
   convertElementStyle,
   convertStylesheet,
   HtmlElement,
-} from './parse.js';
+} from './parse';
 
 describe('parse', () => {
   describe('convertStylesheet', () => {
