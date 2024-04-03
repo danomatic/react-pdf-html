@@ -5,7 +5,7 @@ import { createCache } from './cache.js';
 
 export const CSS_CACHE = createCache({ limit: 30 });
 
-export const resolveCssFile = async (
+export const fetchStylesheet = async (
   src: string,
   fetchOptions?: RequestInit,
   cache = true
@@ -41,7 +41,7 @@ export const fetchStylesheets = async (
     .querySelectorAll('link[rel="stylesheet"][href]')
     .map(async (styleNode) => {
       try {
-        const styleText = await resolveCssFile(
+        const styleText = await fetchStylesheet(
           styleNode.getAttribute('href') as string,
           fetchOptions
         );
