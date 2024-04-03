@@ -11,7 +11,10 @@
     "CSS"
   ],
   "license": "MIT",
-  "repository": "https://github.com/danomatic/react-pdf-html",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danomatic/react-pdf-html.git"
+  },
   "type": "module",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
