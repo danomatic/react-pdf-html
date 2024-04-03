@@ -317,10 +317,18 @@ export const applyStylesheets = (
 ) => {
   stylesheets.forEach((stylesheet) => {
     for (const selector of Object.keys(stylesheet)) {
-      const elements = rootElement.querySelectorAll(selector) as HtmlElement[];
-      elements.forEach((element) => {
-        element.style.push(stylesheet[selector]);
-      });
+      try {
+        const elements = rootElement.querySelectorAll(
+          selector
+        ) as HtmlElement[];
+        elements.forEach((element) => {
+          element.style.push(stylesheet[selector]);
+        });
+      } catch (e) {
+        console.warn(
+          `Unable to apply selector "${selector}": ${(e as Error).message}`
+        );
+      }
     }
   });
 };

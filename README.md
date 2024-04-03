@@ -6,6 +6,7 @@
 - [Browser CSS defaults](https://www.w3schools.com/cssref/css_default_values.asp) with option for [style reset](https://meyerweb.com/eric/tools/css/reset/)
 - Basic `<table>`(attempted using flex layouts) `<ul>` and `<ol>` support
 - Ability to provide custom renderers for any tag
+- Support for inline `<style>` tags and remote stylesheets (using fetch)
 
 ## How it Works
 
@@ -21,6 +22,12 @@
 
 ```bash
 npm i react-pdf-html
+```
+
+OR
+
+```bash
+yarn add react-pdf-html
 ```
 
 ## Usage
@@ -192,6 +199,43 @@ return (
   <Document>
     <Page>
       <Html>{html}</Html>
+    </Page>
+  </Document>
+);
+```
+
+### Remote Styles
+
+Remote styles must be resolve asynchronously, outside of the React rendering,
+because react-pdf doesn't support asynchronous rendering
+
+```tsx
+import { fetchStylesheets } from 'react-pdf-html';
+
+const html = `<html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous" />
+  </head>
+
+  <body>
+    <div></div>
+  </body>
+</html>`;
+
+const stylesheets = await fetchStylesheets(html, {
+    ...fetchOptions
+});
+
+...
+
+return (
+  <Document>
+    <Page>
+      <Html stylesheet={stylesheets}>{html}</Html>
     </Page>
   </Document>
 );

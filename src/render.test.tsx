@@ -35,6 +35,7 @@ import renderers, {
   renderNoop,
   renderPassThrough,
 } from './renderers.js';
+import { fetchStylesheets } from './remoteCss.js';
 
 const inlineElement: HtmlElement = {
   tag: 'span',
@@ -168,6 +169,28 @@ describe('render', () => {
         { color: 'blue' },
         { fontSize: 18 },
       ]);
+    });
+
+    it('Should be able to render external CSS', async () => {
+      const html = `<html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous" />
+  </head>
+  
+  <body>
+    <div></div>
+  </body>
+</html>`;
+
+      const stylesheets = await fetchStylesheets(html);
+      // console.log(stylesheets);
+
+      const rendered = renderHtml(html, { stylesheet: stylesheets });
+      console.log(rendered);
     });
 
     it('Should use a custom renderer', () => {

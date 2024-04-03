@@ -17,7 +17,6 @@ import {
 } from 'css-tree';
 import supportedStyles from './supportedStyles.js';
 import { HtmlStyle, HtmlStyles } from './styles.js';
-import remoteCss from './resolveCssFile.js';
 import camelize from './camelize.js';
 
 export type HtmlContent = (HtmlElement | string)[];
@@ -93,6 +92,10 @@ export const convertStylesheet = (stylesheet: string): HtmlStyles => {
       }
       rule.prelude.children.forEach((selector) => {
         const selectorString = generate(selector);
+        if (selectorString.includes('::')) {
+          // skip pseudo-elements
+          return;
+        }
         response[selectorString] = style;
       });
     });
@@ -111,7 +114,7 @@ export const convertElementStyle = (
     const rules = parsed.children.filter(
       (rule) => rule.type === 'Rule' && rule.prelude?.type === 'SelectorList'
     ) as List<Rule>;
-    const firstRule = rules?.first;
+    const firstRule = rules?.first();
     return firstRule ? convertRule(firstRule.block, tag) : undefined;
   } catch (e) {
     console.error(
@@ -162,23 +165,10 @@ const parseHtml = (
   const html = parse(text, { comment: false });
 
   const stylesheets = html
-    .querySelectorAll('style, link[rel="stylesheet"][href]')
-    .map((styleNode) => {
-      if (styleNode.tagName === 'STYLE') {
-        return styleNode.childNodes
-          .map((textNode) => textNode.rawText.trim())
-          .join('\n');
-      } else {
-        try {
-          return remoteCss(styleNode.getAttribute('href') as string);
-        } catch (e) {
-          console.error(
-            `Unable to get remote CSS file ${styleNode.getAttribute('href')}`,
-            e
-          );
-        }
-      }
-    })
+    .querySelectorAll('style')
+    .map((styleNode) =>
+      styleNode.childNodes.map((textNode) => textNode.rawText.trim()).join('\n')
+    )
     .filter((styleText) => !!styleText)
     .map(convertStylesheet);
   return {
