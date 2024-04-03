@@ -443,12 +443,8 @@ describe('render', () => {
         </Document>
       );
 
-      try {
-        const pdfString = await renderToString(document);
-        // console.log(pdfString);
-      } catch (e) {
-        fail(e);
-      }
+      const pdfString = await renderToString(document);
+      // console.log(pdfString);
     });
   });
 
@@ -596,10 +592,6 @@ describe('render', () => {
       </Document>
     );
 
-    try {
-      const pdfString = await renderToString(document);
-    } catch (e) {
-      fail(e);
-    }
+    const pdfString = await renderToString(document);
   });
 });
