@@ -10,7 +10,7 @@ import cssTree, { Block, Declaration, List, Rule, StyleSheet } from 'css-tree';
 import supportedStyles from './supportedStyles';
 import { HtmlStyle, HtmlStyles } from './styles';
 import remoteCss from './resolveCssFile';
-const camelize = require('camelize');
+import camelize from 'camelize';
 
 export type HtmlContent = (HtmlElement | string)[];
 

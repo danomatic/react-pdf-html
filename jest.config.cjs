@@ -2,6 +2,16 @@
 // https://jestjs.io/docs/en/configuration.html
 
 module.exports = {
+  // ESM config
+  transform: {
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        useESM: true,
+      },
+    ],
+  },
+
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 
@@ -91,8 +101,10 @@ module.exports = {
   // An enum that specifies notification mode. Requires { notify: true }
   // notifyMode: "failure-change",
 
-  // A preset that is used as a base for Jest's configuration
-  preset: 'ts-jest',
+  // A preset that is used as a base for Jest's configuration;
+  // https://kulshekhar.github.io/ts-jest/docs/guides/esm-support/#esm-presets
+  // If you are using custom transform config, please remove preset from your Jest config to avoid issues that Jest doesn't transform files correctly.
+  // preset: 'ts-jest',
 
   // Run tests from one or more projects
   // projects: undefined,
@@ -170,9 +182,9 @@ module.exports = {
   // transform: undefined,
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-  // transformIgnorePatterns: [
-  //   "/node_modules/"
-  // ],
+  transformIgnorePatterns: [
+    "/node_modules/"
+  ],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
   // unmockedModulePathPatterns: undefined,
