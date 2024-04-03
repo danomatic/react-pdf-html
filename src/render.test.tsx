@@ -1,4 +1,4 @@
-import React, { ReactElement, ReactNode } from 'react';
+import * as React from 'react';
 // const stringify = require('json-stringify-safe');
 import { HtmlContent, HtmlElement } from './parse.js';
 import renderHtml, {
@@ -29,13 +29,12 @@ import ReactPDF, {
   Font,
   renderToString,
 } from '@react-pdf/renderer';
-import path from 'path';
+import * as path from 'path';
 import renderers, {
   renderBlock,
   renderNoop,
   renderPassThrough,
 } from './renderers.js';
-import exp from 'constants';
 
 const inlineElement: HtmlElement = {
   tag: 'span',

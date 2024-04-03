@@ -6,11 +6,19 @@ import {
   TextNode,
 } from 'node-html-parser';
 import { Tag } from './tags.js';
-import cssTree, { Block, Declaration, List, Rule, StyleSheet } from 'css-tree';
+import {
+  generate,
+  parse as cssParse,
+  Block,
+  Declaration,
+  List,
+  Rule,
+  StyleSheet,
+} from 'css-tree';
 import supportedStyles from './supportedStyles.js';
 import { HtmlStyle, HtmlStyles } from './styles.js';
 import remoteCss from './resolveCssFile.js';
-import camelize from 'camelize';
+import camelize from './camelize.js';
 
 export type HtmlContent = (HtmlElement | string)[];
 
@@ -38,7 +46,7 @@ export const convertRule = (
       property: camelize(entry.property as string),
     }))
     .reduce((style, { property, value }: Declaration) => {
-      let valueString = cssTree.generate(value);
+      let valueString = generate(value);
       if (property && value) {
         if (property === 'fontFamily') {
           valueString = valueString.replace(/["']+/g, '');
@@ -74,7 +82,7 @@ export const convertRule = (
 export const convertStylesheet = (stylesheet: string): HtmlStyles => {
   const response = {} as HtmlStyles;
   try {
-    const parsed = cssTree.parse(stylesheet) as StyleSheet;
+    const parsed = cssParse(stylesheet) as StyleSheet;
     const rules = parsed.children.filter(
       (rule) => rule.type === 'Rule' && rule.prelude?.type === 'SelectorList'
     ) as List<Rule>;
@@ -84,7 +92,7 @@ export const convertStylesheet = (stylesheet: string): HtmlStyles => {
         return;
       }
       rule.prelude.children.forEach((selector) => {
-        const selectorString = cssTree.generate(selector);
+        const selectorString = generate(selector);
         response[selectorString] = style;
       });
     });
@@ -99,7 +107,7 @@ export const convertElementStyle = (
   tag: string
 ): HtmlStyle | undefined => {
   try {
-    const parsed = cssTree.parse(`${tag} { ${styleAttr} }`) as StyleSheet;
+    const parsed = cssParse(`${tag} { ${styleAttr} }`) as StyleSheet;
     const rules = parsed.children.filter(
       (rule) => rule.type === 'Rule' && rule.prelude?.type === 'SelectorList'
     ) as List<Rule>;

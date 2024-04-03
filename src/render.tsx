@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import * as React from 'react';
 import renderers, {
   renderBlock,
   renderInline,
@@ -149,7 +149,11 @@ export const bucketElements = (
   return buckets;
 };
 
-type RenderedContent = ReactElement | ReactElement[] | string | string[];
+type RenderedContent =
+  | React.ReactElement
+  | React.ReactElement[]
+  | string
+  | string[];
 
 export const renderElement = (
   element: HtmlElement | string,
@@ -330,7 +334,7 @@ const renderHtml = (
     stylesheet?: HtmlStyles | HtmlStyles[];
     resetStyles?: boolean;
   } = {}
-): ReactElement => {
+): React.ReactElement => {
   const defaultFontSize = 18;
   const fontSizeStyle = { fontSize: defaultFontSize };
   const styles = options.style

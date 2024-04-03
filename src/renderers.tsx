@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import {
   Circle,
   ClipPath,
@@ -25,7 +25,7 @@ import { HtmlElement } from './parse.js';
 import { HtmlStyle } from './styles.js';
 import { lowerAlpha, orderedAlpha, upperAlpha } from './ordered.type.js';
 import { Style } from '@react-pdf/types';
-import camelize from 'camelize';
+import camelize from './camelize.js';
 
 export const renderNoop: HtmlRenderer = ({ children }) => <></>;
 

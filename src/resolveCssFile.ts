@@ -1,7 +1,7 @@
-import fs from 'fs';
-import url from 'url';
-import path from 'path';
-import fetch from 'sync-fetch';
+import * as fs from 'fs';
+import * as url from 'url';
+import * as path from 'path';
+import * as fetch from 'sync-fetch';
 
 const isBrowser = !fs || !url || !path;
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import renderHtml, { HtmlRenderers } from './render.js';
 import { HtmlStyle, HtmlStyles } from './styles.js';
 
