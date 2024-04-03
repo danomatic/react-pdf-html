@@ -103,7 +103,7 @@ export const convertElementStyle = (
     const rules = parsed.children.filter(
       (rule) => rule.type === 'Rule' && rule.prelude?.type === 'SelectorList'
     ) as List<Rule>;
-    const firstRule = rules.first();
+    const firstRule = rules?.first;
     return firstRule ? convertRule(firstRule.block, tag) : undefined;
   } catch (e) {
     console.error(
