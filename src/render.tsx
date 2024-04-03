@@ -1,10 +1,14 @@
 import React, { ReactElement } from 'react';
-import renderers, { renderBlock, renderInline, renderNoop } from './renderers';
+import renderers, {
+  renderBlock,
+  renderInline,
+  renderNoop,
+} from './renderers.js';
 import { Text, View } from '@react-pdf/renderer';
-import parseHtml, { HtmlContent, HtmlElement } from './parse';
-import { createHtmlStylesheet, HtmlStyle, HtmlStyles } from './styles';
+import parseHtml, { HtmlContent, HtmlElement } from './parse.js';
+import { createHtmlStylesheet, HtmlStyle, HtmlStyles } from './styles.js';
 import { Style } from '@react-pdf/types';
-import { isText, Tag } from './tags';
+import { isText, Tag } from './tags.js';
 
 export type HtmlRendererProps = {
   element: HtmlElement;

@@ -1,6 +1,6 @@
 import React from 'react';
-import renderHtml, { HtmlRenderers } from './render';
-import { HtmlStyle, HtmlStyles } from './styles';
+import renderHtml, { HtmlRenderers } from './render.js';
+import { HtmlStyle, HtmlStyles } from './styles.js';
 
 export type HtmlProps = {
   collapse?: boolean;

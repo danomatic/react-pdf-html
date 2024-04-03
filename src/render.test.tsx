@@ -1,11 +1,11 @@
 import React, { ReactElement, ReactNode } from 'react';
 // const stringify = require('json-stringify-safe');
-import { HtmlContent, HtmlElement } from './parse';
+import { HtmlContent, HtmlElement } from './parse.js';
 import renderHtml, {
   bucketElements,
   collapseWhitespace,
   hasBlockContent,
-} from './render';
+} from './render.js';
 
 const scrub = (object: any) => {
   if (Array.isArray(object)) {
@@ -34,7 +34,7 @@ import renderers, {
   renderBlock,
   renderNoop,
   renderPassThrough,
-} from './renderers';
+} from './renderers.js';
 import exp from 'constants';
 
 const inlineElement: HtmlElement = {
