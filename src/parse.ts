@@ -6,15 +6,10 @@ import {
   TextNode,
 } from 'node-html-parser';
 import { Tag } from './tags.js';
-import {
-  generate,
-  parse as cssParse,
-  Block,
-  Declaration,
-  List,
-  Rule,
-  StyleSheet,
-} from 'css-tree';
+import { Block, Declaration, List, Rule, StyleSheet } from 'css-tree';
+import * as cssTree from 'css-tree';
+const { generate, parse: cssParse } = cssTree;
+
 import supportedStyles from './supportedStyles.js';
 import { HtmlStyle, HtmlStyles } from './styles.js';
 import camelize from './camelize.js';
