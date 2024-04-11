@@ -157,6 +157,8 @@ const renderers: HtmlRenderers = {
         bullet = (
           <Text>{orderedAlpha[element.indexOfType].toUpperCase()}.</Text>
         );
+      } else if (element.attributes.value) {
+        bullet = <Text>{element.attributes.value}.</Text>;
       } else {
         bullet = <Text>{element.indexOfType + 1}.</Text>;
       }
