@@ -40,16 +40,14 @@ export const convertRule = (
       property: camelize(entry.property as string),
     }))
     .reduce((style, { property, value }: Declaration) => {
-      let valueString = generate(value);
+      let valueString: string | string[] = generate(value);
       if (property && value) {
         if (property === 'fontFamily') {
+          console.log('fontFamily', valueString);
           valueString = valueString.replace(/["']+/g, '');
           if (valueString.includes(',')) {
-            const reduced = valueString.split(',', 2)[0];
-            console.warn(
-              `react-pdf doesn't support fontFamily lists like "${valueString}". Reducing to "${reduced}".`
-            );
-            valueString = reduced;
+            const splitValue = valueString.split(',');
+            valueString = splitValue;
           }
         } else if (!supportedStyles.includes(property)) {
           if (

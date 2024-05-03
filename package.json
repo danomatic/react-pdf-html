@@ -42,11 +42,11 @@
     "node-html-parser": "^6.1.13"
   },
   "peerDependencies": {
-    "@react-pdf/renderer": ">=3",
+    "@react-pdf/renderer": ">=3.4.4",
     "react": ">=16"
   },
   "devDependencies": {
-    "@react-pdf/renderer": "^3.0.0",
+    "@react-pdf/renderer": "^3.4.4",
     "@types/css-tree": "^1.0.7",
     "@types/jest": "^25.2.3",
     "@types/node": "^14.0.25",
