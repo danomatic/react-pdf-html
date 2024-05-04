@@ -43,7 +43,6 @@ export const convertRule = (
       let valueString: string | string[] = generate(value);
       if (property && value) {
         if (property === 'fontFamily') {
-          console.log('fontFamily', valueString);
           valueString = valueString.replace(/["']+/g, '');
           if (valueString.includes(',')) {
             const splitValue = valueString.split(',');
