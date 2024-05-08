@@ -79,6 +79,17 @@ describe('parse', () => {
 
       expect(result).toEqual(expected);
     });
+
+    it('Should support fallback fonts', () => {
+      const content = `font-family: "Helvetica Neue", Helvetica, 'Noto Sans', sans-serif`;
+
+      const result = convertElementStyle(content, 'div');
+      const expected = {
+        fontFamily: ['Helvetica Neue', 'Helvetica', 'Noto Sans', 'sans-serif'],
+      };
+
+      expect(result).toEqual(expected);
+    });
   });
 
   describe('parseHtml', () => {
