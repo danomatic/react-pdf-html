@@ -150,15 +150,11 @@ const renderers: HtmlRenderers = {
       );
     } else if (ordered) {
       if (lowerAlpha.includes(listStyleType)) {
-        bullet = (
-          <Text>{orderedAlpha[element.indexOfType].toLowerCase()}.</Text>
-        );
+        bullet = <Text>{orderedAlpha[element.indexOfType].toLowerCase()}</Text>;
       } else if (upperAlpha.includes(listStyleType)) {
-        bullet = (
-          <Text>{orderedAlpha[element.indexOfType].toUpperCase()}.</Text>
-        );
+        bullet = <Text>{orderedAlpha[element.indexOfType].toUpperCase()}</Text>;
       } else {
-        bullet = <Text>{element.indexOfType + 1}.</Text>;
+        bullet = <Text>{element.indexOfType + 1}</Text>;
       }
     } else {
       // if (listStyleType.includes('square')) {
