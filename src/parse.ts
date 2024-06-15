@@ -7,8 +7,7 @@ import {
 } from 'node-html-parser';
 import { Tag } from './tags.js';
 import { Block, Declaration, List, Rule, StyleSheet } from 'css-tree';
-import * as cssTree from 'css-tree';
-const { generate, parse: cssParse } = cssTree;
+import { generate, parse as cssParse } from 'css-tree';
 
 import supportedStyles from './supportedStyles.js';
 import { HtmlStyle, HtmlStyles } from './styles.js';
