@@ -158,7 +158,9 @@ const renderers: HtmlRenderers = {
           <Text>{orderedAlpha[element.indexOfType].toUpperCase()}.</Text>
         );
       } else {
-        bullet = <Text>{element.indexOfType + 1}.</Text>;
+        const start = parseInt(element.parentNode.attributes.start);
+        const offset = isNaN(start) ? 1 : start;
+        bullet = <Text>{element.indexOfType + offset}.</Text>;
       }
     } else {
       // if (listStyleType.includes('square')) {
