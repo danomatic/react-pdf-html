@@ -309,7 +309,6 @@ describe('render', () => {
 `;
 
       const rootView = renderHtml(content);
-      scrub(rootView);
 
       expect(rootView.type).toBe(View);
       expect(rootView.props.children.length).toBe(2);
@@ -332,7 +331,6 @@ describe('render', () => {
 `;
 
       const rootView = renderHtml(content);
-      scrub(rootView);
 
       expect(rootView.type).toBe(View);
 
@@ -352,7 +350,6 @@ describe('render', () => {
 `;
 
       const rootView = renderHtml(content);
-      scrub(rootView);
 
       expect(rootView.type).toBe(View);
 
@@ -468,6 +465,17 @@ describe('render', () => {
       const pdfString = await renderToString(document);
       // console.log(pdfString);
     });
+  });
+
+  it('Should render newline as space between text elements', async () => {
+    const content = `<p><strong>hello</strong>
+<span> world</span></p>`;
+
+    const rootView = renderHtml(content);
+    const rootTextElement = rootView.props.children.props.children;
+    expect(rootTextElement.type).toBe('TEXT');
+    expect(rootTextElement.props.children.length).toBe(3);
+    expect(rootTextElement.props.children[1]).toBe(' ');
   });
 
   it('Should render a PDF with an svg without errors', async () => {
