@@ -150,18 +150,20 @@ const renderers: HtmlRenderers = {
       );
     } else if (ordered) {
       const currentIndex = element.indexOfType;
-      let updatedIndex = currentIndex;
+      const start = parseInt(element.parentNode.attributes.start, 10);
+      const offset = isNaN(start) ? 0 : start - 1; // keep it zero based for later
+
+      let updatedIndex = currentIndex + offset;
       for (
         let previousIndex = currentIndex;
         previousIndex >= 0;
         previousIndex -= 1
       ) {
         const sibling = element.parentNode.childNodes[previousIndex];
-        const startValue = sibling.attributes.value;
+        const startValue = parseInt(sibling.attributes.value, 10);
   
-        if (startValue) {
-          const intValue = parseInt(startValue, 10);
-          updatedIndex = intValue + (currentIndex - previousIndex) - 1;
+        if (!isNaN(startValue)) {
+          updatedIndex = startValue + (currentIndex - previousIndex) - 1;
           break;
         }
       }
