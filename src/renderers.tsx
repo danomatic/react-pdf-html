@@ -49,6 +49,33 @@ const convertSvgStyles = (stylesTags: Style[]): Style => {
   return stylesTags.reduce((acc, cur) => ({ ...acc, ...cur }), {});
 };
 
+export function toRoman(num: number) {
+  let result = '';
+  const conversationMap = new Map<number, string>([
+    [1000, 'M'],
+    [900, 'CM'],
+    [500, 'D'],
+    [400, 'CD'],
+    [100, 'C'],
+    [90, 'XC'],
+    [50, 'L'],
+    [40, 'XL'],
+    [10, 'X'],
+    [9, 'IX'],
+    [5, 'V'],
+    [4, 'IV'],
+    [1, 'I'],
+  ]);
+  conversationMap.forEach((roman, decimal) => {
+    let quotient: bigint = BigInt(num) / BigInt(decimal);
+    num = num % decimal;
+    while (quotient--) {
+      result += roman;
+    }
+  });
+  return result;
+}
+
 export const renderSvgs: WrapperRenderer = (
   Wrapper,
   { element, style, children }
@@ -149,18 +176,39 @@ const renderers: HtmlRenderers = {
         />
       );
     } else if (ordered) {
+      const currentIndex = element.indexOfType;
+      const start = parseInt(element.parentNode.attributes.start, 10);
+      const offset = isNaN(start) ? 0 : start - 1; // keep it zero based for later
+
+      let updatedIndex = currentIndex + offset;
+      for (
+        let previousIndex = currentIndex;
+        previousIndex >= 0;
+        previousIndex -= 1
+      ) {
+        const sibling = element.parentNode.childNodes[previousIndex];
+        const startValue = parseInt(sibling.attributes.value, 10);
+  
+        if (!isNaN(startValue)) {
+          updatedIndex = startValue + (currentIndex - previousIndex) - 1;
+          break;
+        }
+      }
+      
       if (lowerAlpha.includes(listStyleType)) {
         bullet = (
-          <Text>{orderedAlpha[element.indexOfType].toLowerCase()}.</Text>
+          <Text>{orderedAlpha[updatedIndex].toLowerCase()}.</Text>
         );
       } else if (upperAlpha.includes(listStyleType)) {
         bullet = (
-          <Text>{orderedAlpha[element.indexOfType].toUpperCase()}.</Text>
+          <Text>{orderedAlpha[updatedIndex].toUpperCase()}.</Text>
         );
+      } else if (listStyleType == 'lower-roman') {
+        bullet = <Text>{toRoman(element.indexOfType + 1).toLowerCase()}.</Text>;
+      } else if (listStyleType == 'upper-roman') {
+        bullet = <Text>{toRoman(element.indexOfType + 1).toUpperCase()}.</Text>;
       } else {
-        const start = parseInt(element.parentNode.attributes.start);
-        const offset = isNaN(start) ? 1 : start;
-        bullet = <Text>{element.indexOfType + offset}.</Text>;
+        bullet = <Text>{updatedIndex + 1}.</Text>;
       }
     } else {
       // if (listStyleType.includes('square')) {
