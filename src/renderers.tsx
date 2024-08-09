@@ -230,21 +230,27 @@ const renderers: HtmlRenderers = {
       const offset = isNaN(start) ? 0 : start - 1; // keep it zero based for later
 
       let updatedIndex = currentIndex + offset;
-      for (
-        let previousIndex = currentIndex;
-        previousIndex >= 0;
-        previousIndex -= 1
-      ) {
-        const sibling: HtmlElement = element.parentNode.childNodes[
-          previousIndex
-        ] as HtmlElement;
-        const startValue = parseInt(sibling.attributes.value, 10);
+      let currentElement: HtmlElement | null = element;
+      let sibling: HtmlElement | null = currentElement;
+      do {
+        currentElement = sibling;
+        sibling = currentElement.previousElementSibling as HtmlElement | null;
 
-        if (!isNaN(startValue)) {
-          updatedIndex = startValue + (currentIndex - previousIndex) - 1;
+        if (!currentElement) {
           break;
         }
-      }
+        if (currentElement.tag !== 'li') {
+          // skip all other element types because they do not belong in a list
+          continue;
+        }
+        const startValue = parseInt(currentElement.attributes.value, 10);
+
+        if (!isNaN(startValue)) {
+          updatedIndex =
+            startValue + (currentIndex - currentElement.indexOfType) - 1;
+          break;
+        }
+      } while (!!sibling);
 
       if (lowerAlpha.includes(listStyleType)) {
         bullet = <Text>{orderedAlpha[updatedIndex].toLowerCase()}.</Text>;
