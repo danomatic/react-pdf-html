@@ -149,18 +149,35 @@ const renderers: HtmlRenderers = {
         />
       );
     } else if (ordered) {
+      const currentIndex = element.indexOfType;
+      const start = parseInt(element.parentNode.attributes.start, 10);
+      const offset = isNaN(start) ? 0 : start - 1; // keep it zero based for later
+
+      let updatedIndex = currentIndex + offset;
+      for (
+        let previousIndex = currentIndex;
+        previousIndex >= 0;
+        previousIndex -= 1
+      ) {
+        const sibling = element.parentNode.childNodes[previousIndex];
+        const startValue = parseInt(sibling.attributes.value, 10);
+  
+        if (!isNaN(startValue)) {
+          updatedIndex = startValue + (currentIndex - previousIndex) - 1;
+          break;
+        }
+      }
+      
       if (lowerAlpha.includes(listStyleType)) {
         bullet = (
-          <Text>{orderedAlpha[element.indexOfType].toLowerCase()}.</Text>
+          <Text>{orderedAlpha[updatedIndex].toLowerCase()}.</Text>
         );
       } else if (upperAlpha.includes(listStyleType)) {
         bullet = (
-          <Text>{orderedAlpha[element.indexOfType].toUpperCase()}.</Text>
+          <Text>{orderedAlpha[updatedIndex].toUpperCase()}.</Text>
         );
       } else {
-        const start = parseInt(element.parentNode.attributes.start);
-        const offset = isNaN(start) ? 1 : start;
-        bullet = <Text>{element.indexOfType + offset}.</Text>;
+        bullet = <Text>{updatedIndex + 1}.</Text>;
       }
     } else {
       // if (listStyleType.includes('square')) {
