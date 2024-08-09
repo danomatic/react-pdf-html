@@ -315,22 +315,25 @@ export const applyStylesheets = (
   stylesheets: HtmlStyles[],
   rootElement: HtmlElement
 ) => {
-  stylesheets.forEach((stylesheet) => {
-    for (const selector of Object.keys(stylesheet)) {
-      try {
-        const elements = rootElement.querySelectorAll(
-          selector
-        ) as HtmlElement[];
-        elements.forEach((element) => {
-          element.style.push(stylesheet[selector]);
-        });
-      } catch (e) {
-        console.warn(
-          `Unable to apply selector "${selector}": ${(e as Error).message}`
-        );
+  stylesheets
+    .slice()
+    .reverse()
+    .forEach((stylesheet) => {
+      for (const selector of Object.keys(stylesheet)) {
+        try {
+          const elements = rootElement.querySelectorAll(
+            selector
+          ) as HtmlElement[];
+          elements.forEach((element) => {
+            element.style.unshift(stylesheet[selector]);
+          });
+        } catch (e) {
+          console.warn(
+            `Unable to apply selector "${selector}": ${(e as Error).message}`
+          );
+        }
       }
-    }
-  });
+    });
 };
 
 const renderHtml = (

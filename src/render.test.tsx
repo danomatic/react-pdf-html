@@ -32,6 +32,7 @@ import ReactPDF, {
 import * as path from 'path';
 import renderers, {
   renderBlock,
+  renderCell,
   renderNoop,
   renderPassThrough,
 } from './renderers.js';
@@ -365,6 +366,71 @@ describe('render', () => {
       const span = text.props.children[1];
       expect(span.props.element.tag).toBe('span');
       expect(span.props.children).toBe('and more');
+    });
+
+    it('Should render table widths', () => {
+      const content = `
+<table>
+    <tbody>
+        <tr>
+            <td>foo</td>
+            <td>bar</td>
+            <td>foobar</td>
+        </tr>
+        <tr>
+            <td colspan="2">foobar</td>
+            <td style="width: 10%">foo</td>
+        </tr>
+    </tbody>
+</table>
+`;
+
+      const rootView = renderHtml(content);
+
+      expect(rootView.type).toBe(View);
+
+      const table = rootView.props.children;
+      expect(table.type).toBe(renderers.table);
+      expect(table.props.element.tag).toBe('table');
+
+      const tbody = table.props.children;
+      expect(tbody.props.element.tag).toBe('tbody');
+
+      const row1 = tbody.props.children[0];
+      expect(row1.props.element.tag).toBe('tr');
+
+      const row1Col1 = row1.props.children[0];
+      expect(row1Col1.props.element.tag).toBe('td');
+
+      const renderedRow1Col1 = renderCell(row1Col1.props);
+      console.log(
+        'renderedRow1Col1',
+        JSON.stringify(renderedRow1Col1, null, 2)
+      );
+      expect(renderedRow1Col1?.props.style[0].width).toBe('33%');
+
+      const row2 = tbody.props.children[1];
+      expect(row2.props.element.tag).toBe('tr');
+
+      const row2Col1 = row2.props.children[0];
+      expect(row2Col1.props.element.tag).toBe('td');
+      const renderedRow2Col1 = renderCell(row2Col1.props);
+      console.log(
+        'renderedRow2Col1',
+        JSON.stringify(renderedRow2Col1, null, 2)
+      );
+      expect(renderedRow2Col1?.props.style[0].width).toBe('66%');
+
+      const row2Col2 = row2.props.children[1];
+      expect(row2Col2.props.element.tag).toBe('td');
+      const renderedRow2Col2 = renderCell(row2Col2.props);
+      console.log(
+        'renderedRow2Col2',
+        JSON.stringify(renderedRow2Col2, null, 2)
+      );
+
+      expect(renderedRow2Col2?.props.style[0].width).toBe('33%');
+      expect(renderedRow2Col2?.props.style[2].width).toBe('10%');
     });
 
     it('Should render a PDF with custom font without errors', async () => {

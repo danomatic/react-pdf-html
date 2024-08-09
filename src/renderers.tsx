@@ -26,7 +26,8 @@ import { HtmlStyle } from './styles.js';
 import { lowerAlpha, orderedAlpha, upperAlpha } from './ordered.type.js';
 import { Style } from '@react-pdf/types';
 import camelize from './camelize.js';
-import HTMLElement from 'node-html-parser/dist/nodes/html';
+import { Node, HTMLElement } from 'node-html-parser';
+import NodeType from 'node-html-parser/dist/nodes/type';
 
 export const renderNoop: HtmlRenderer = ({ children }) => <></>;
 
@@ -99,6 +100,51 @@ export const renderInline: HtmlRenderer = ({ style, children }) => (
   <Text style={style}>{children}</Text>
 );
 
+export const childElements = (
+  element: HTMLElement,
+  tagNames?: string[]
+): HTMLElement[] =>
+  element.childNodes.filter(
+    (child) =>
+      child.nodeType === NodeType.ELEMENT_NODE &&
+      (!tagNames ||
+        tagNames.includes((child as HTMLElement).tagName.toLowerCase()))
+  ) as HTMLElement[];
+
+export const getRows = (table: HTMLElement): HTMLElement[] => {
+  let rows = childElements(table, ['tr']);
+
+  const sections = childElements(table, ['tbody', 'thead']);
+  sections.forEach((section) => {
+    rows = rows.concat(childElements(section, ['tr']));
+  });
+  return rows;
+};
+
+export const getMaxColumns = (table: HTMLElement) => {
+  if (!table) {
+    return 1;
+  }
+  let rows = getRows(table);
+
+  const colCounts = rows.map((row) => {
+    let colCount = 0;
+    childElements(row, ['td', 'th']).forEach((col) => {
+      const colspan = parseInt(col.attributes.colspan, 10);
+      if (isNaN(colspan)) {
+        colCount++;
+      } else {
+        colCount += colspan;
+      }
+    });
+    return colCount;
+  });
+
+  // const colCounts = rows.map((row) => childElements(row, ['td', 'th']).length);
+
+  return Math.max(1, ...colCounts);
+};
+
 export const renderCell: HtmlRenderer = ({ style, element, children }) => {
   const table = element.closest('table') as HtmlElement | undefined;
   if (!table) {
@@ -129,15 +175,18 @@ export const renderCell: HtmlRenderer = ({ style, element, children }) => {
     }
   }
 
-  const overrides: HtmlStyle = {};
+  const colCount = getMaxColumns(table);
+  const basePercent = Math.round(100 / colCount);
+  baseStyles.width = basePercent + '%';
+
   if (element.attributes && element.attributes.colspan) {
     const colspan = parseInt(element.attributes.colspan, 10);
     if (!isNaN(colspan)) {
-      overrides.width = colspan * 100 + '%';
+      baseStyles.width = colspan * basePercent + '%';
     }
   }
 
-  return <View style={[baseStyles, ...style, overrides]}>{children}</View>;
+  return <View style={[baseStyles, ...style]}>{children}</View>;
 };
 
 const renderers: HtmlRenderers = {
@@ -187,9 +236,9 @@ const renderers: HtmlRenderers = {
         previousIndex >= 0;
         previousIndex -= 1
       ) {
-        const sibling: HTMLElement = element.parentNode.childNodes[
+        const sibling: HtmlElement = element.parentNode.childNodes[
           previousIndex
-        ] as HTMLElement;
+        ] as HtmlElement;
         const startValue = parseInt(sibling.attributes.value, 10);
 
         if (!isNaN(startValue)) {
