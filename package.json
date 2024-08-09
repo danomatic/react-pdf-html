@@ -1,6 +1,6 @@
 {
   "name": "react-pdf-html",
-  "version": "2.0.5",
+  "version": "2.1.0",
   "author": "Dan Blaisdell dan@manifestwebdesign.com",
   "description": "Html component for react-pdf with CSS support",
   "keywords": [
