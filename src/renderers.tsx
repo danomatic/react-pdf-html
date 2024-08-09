@@ -175,13 +175,13 @@ export const renderCell: HtmlRenderer = ({ style, element, children }) => {
   }
 
   const colCount = getMaxColumns(table);
-  const basePercent = Math.round(100 / colCount);
-  baseStyles.width = basePercent + '%';
+  const basePercent = 100 / colCount;
+  baseStyles.width = basePercent.toFixed(5) + '%';
 
   if (element.attributes && element.attributes.colspan) {
     const colspan = parseInt(element.attributes.colspan, 10);
     if (!isNaN(colspan)) {
-      baseStyles.width = colspan * basePercent + '%';
+      baseStyles.width = (colspan * basePercent).toFixed(5) + '%';
     }
   }
 

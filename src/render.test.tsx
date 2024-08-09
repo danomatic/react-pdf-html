@@ -407,7 +407,7 @@ describe('render', () => {
         'renderedRow1Col1',
         JSON.stringify(renderedRow1Col1, null, 2)
       );
-      expect(renderedRow1Col1?.props.style[0].width).toBe('33%');
+      expect(renderedRow1Col1?.props.style[0].width).toBe('33.33333%');
 
       const row2 = tbody.props.children[1];
       expect(row2.props.element.tag).toBe('tr');
@@ -419,7 +419,7 @@ describe('render', () => {
         'renderedRow2Col1',
         JSON.stringify(renderedRow2Col1, null, 2)
       );
-      expect(renderedRow2Col1?.props.style[0].width).toBe('66%');
+      expect(renderedRow2Col1?.props.style[0].width).toBe('66.66667%');
 
       const row2Col2 = row2.props.children[1];
       expect(row2Col2.props.element.tag).toBe('td');
@@ -429,7 +429,7 @@ describe('render', () => {
         JSON.stringify(renderedRow2Col2, null, 2)
       );
 
-      expect(renderedRow2Col2?.props.style[0].width).toBe('33%');
+      expect(renderedRow2Col2?.props.style[0].width).toBe('33.33333%');
       expect(renderedRow2Col2?.props.style[2].width).toBe('10%');
     });
 
