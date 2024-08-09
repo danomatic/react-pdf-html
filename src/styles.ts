@@ -149,12 +149,12 @@ export const createHtmlStylesheet = <T extends HtmlStyles>(
     td: {
       flexGrow: 1,
       flexShrink: 1,
-      flexBasis: 1,
+      width: '100%',
     },
     th: {
       flexGrow: 1,
       flexShrink: 1,
-      flexBasis: 1,
+      width: '100%',
       fontWeight: 'bold',
     },
   };

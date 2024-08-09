@@ -105,7 +105,7 @@ export const renderCell: HtmlRenderer = ({ style, element, children }) => {
   if (element.attributes && element.attributes.colspan) {
     const colspan = parseInt(element.attributes.colspan, 10);
     if (!isNaN(colspan)) {
-      overrides.flexBasis = colspan;
+      overrides.width = colspan * 100 + '%';
     }
   }
 
