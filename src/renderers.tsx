@@ -26,6 +26,7 @@ import { HtmlStyle } from './styles.js';
 import { lowerAlpha, orderedAlpha, upperAlpha } from './ordered.type.js';
 import { Style } from '@react-pdf/types';
 import camelize from './camelize.js';
+import HTMLElement from 'node-html-parser/dist/nodes/html';
 
 export const renderNoop: HtmlRenderer = ({ children }) => <></>;
 
@@ -186,23 +187,21 @@ const renderers: HtmlRenderers = {
         previousIndex >= 0;
         previousIndex -= 1
       ) {
-        const sibling = element.parentNode.childNodes[previousIndex];
+        const sibling: HTMLElement = element.parentNode.childNodes[
+          previousIndex
+        ] as HTMLElement;
         const startValue = parseInt(sibling.attributes.value, 10);
-  
+
         if (!isNaN(startValue)) {
           updatedIndex = startValue + (currentIndex - previousIndex) - 1;
           break;
         }
       }
-      
+
       if (lowerAlpha.includes(listStyleType)) {
-        bullet = (
-          <Text>{orderedAlpha[updatedIndex].toLowerCase()}.</Text>
-        );
+        bullet = <Text>{orderedAlpha[updatedIndex].toLowerCase()}.</Text>;
       } else if (upperAlpha.includes(listStyleType)) {
-        bullet = (
-          <Text>{orderedAlpha[updatedIndex].toUpperCase()}.</Text>
-        );
+        bullet = <Text>{orderedAlpha[updatedIndex].toUpperCase()}.</Text>;
       } else if (listStyleType == 'lower-roman') {
         bullet = <Text>{toRoman(element.indexOfType + 1).toLowerCase()}.</Text>;
       } else if (listStyleType == 'upper-roman') {
