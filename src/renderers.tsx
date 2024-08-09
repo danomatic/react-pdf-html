@@ -49,6 +49,33 @@ const convertSvgStyles = (stylesTags: Style[]): Style => {
   return stylesTags.reduce((acc, cur) => ({ ...acc, ...cur }), {});
 };
 
+export function toRoman(num: number) {
+  let result = '';
+  const conversationMap = new Map<number, string>([
+    [1000, 'M'],
+    [900, 'CM'],
+    [500, 'D'],
+    [400, 'CD'],
+    [100, 'C'],
+    [90, 'XC'],
+    [50, 'L'],
+    [40, 'XL'],
+    [10, 'X'],
+    [9, 'IX'],
+    [5, 'V'],
+    [4, 'IV'],
+    [1, 'I'],
+  ]);
+  conversationMap.forEach((roman, decimal) => {
+    let quotient: bigint = BigInt(num) / BigInt(decimal);
+    num = num % decimal;
+    while (quotient--) {
+      result += roman;
+    }
+  });
+  return result;
+}
+
 export const renderSvgs: WrapperRenderer = (
   Wrapper,
   { element, style, children }
@@ -176,6 +203,10 @@ const renderers: HtmlRenderers = {
         bullet = (
           <Text>{orderedAlpha[updatedIndex].toUpperCase()}.</Text>
         );
+      } else if (listStyleType == 'lower-roman') {
+        bullet = <Text>{toRoman(element.indexOfType + 1).toLowerCase()}.</Text>;
+      } else if (listStyleType == 'upper-roman') {
+        bullet = <Text>{toRoman(element.indexOfType + 1).toUpperCase()}.</Text>;
       } else {
         bullet = <Text>{updatedIndex + 1}.</Text>;
       }
