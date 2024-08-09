@@ -26,8 +26,7 @@ import { HtmlStyle } from './styles.js';
 import { lowerAlpha, orderedAlpha, upperAlpha } from './ordered.type.js';
 import { Style } from '@react-pdf/types';
 import camelize from './camelize.js';
-import { Node, HTMLElement } from 'node-html-parser';
-import NodeType from 'node-html-parser/dist/nodes/type';
+import { NodeType } from 'node-html-parser';
 
 export const renderNoop: HtmlRenderer = ({ children }) => <></>;
 
@@ -101,17 +100,17 @@ export const renderInline: HtmlRenderer = ({ style, children }) => (
 );
 
 export const childElements = (
-  element: HTMLElement,
+  element: HtmlElement,
   tagNames?: string[]
-): HTMLElement[] =>
+): HtmlElement[] =>
   element.childNodes.filter(
     (child) =>
       child.nodeType === NodeType.ELEMENT_NODE &&
       (!tagNames ||
-        tagNames.includes((child as HTMLElement).tagName.toLowerCase()))
-  ) as HTMLElement[];
+        tagNames.includes((child as HtmlElement).tagName.toLowerCase()))
+  ) as HtmlElement[];
 
-export const getRows = (table: HTMLElement): HTMLElement[] => {
+export const getRows = (table: HtmlElement): HtmlElement[] => {
   let rows = childElements(table, ['tr']);
 
   const sections = childElements(table, ['tbody', 'thead']);
@@ -121,7 +120,7 @@ export const getRows = (table: HTMLElement): HTMLElement[] => {
   return rows;
 };
 
-export const getMaxColumns = (table: HTMLElement) => {
+export const getMaxColumns = (table: HtmlElement) => {
   if (!table) {
     return 1;
   }

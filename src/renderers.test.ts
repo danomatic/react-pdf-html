@@ -1,6 +1,6 @@
 import { childElements, getMaxColumns, getRows } from './renderers';
-import { HTMLElement } from 'node-html-parser';
 import NodeType from 'node-html-parser/dist/nodes/type';
+import { HtmlElement } from './parse';
 
 const table = {
   nodeType: NodeType.ELEMENT_NODE,
@@ -68,7 +68,7 @@ const table = {
       ],
     },
   ],
-} as unknown as HTMLElement;
+} as unknown as HtmlElement;
 
 describe('renderers', () => {
   describe('childElements', () => {
