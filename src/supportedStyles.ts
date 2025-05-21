@@ -11,6 +11,9 @@ export default [
   'flexBasis',
   'justifyContent',
   'order',
+  'gap',
+  'columnGap',
+  'rowGap',
 
   // Layout
   'bottom',
@@ -20,6 +23,7 @@ export default [
   'right',
   'top',
   'overflow',
+  'zIndex',
 
   // Dimension
   'height',
