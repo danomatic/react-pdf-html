@@ -1,7 +1,7 @@
 {
-  "name": "react-pdf-html-simple",
-  "version": "2.1.4",
-  "author": "Mark Macdonald forked from Dan Blaisdell dan@manifestwebdesign.com",
+  "name": "react-pdf-html",
+  "version": "2.1.3",
+  "author": "Dan Blaisdell dan@manifestwebdesign.com",
   "description": "Html component for react-pdf with CSS support",
   "keywords": [
     "PDF",
