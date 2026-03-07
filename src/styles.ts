@@ -3,13 +3,12 @@ import { Style } from '@react-pdf/types';
 import { Tag } from './tags.js';
 
 export type HtmlStyle =
-  | (Style & {
+  | Style & {
       listStyle?: string;
       listStyleType?: string;
       borderSpacing?: number | string;
       borderCollapse?: string;
-    })
-  | any;
+    };
 
 export type HtmlStyles = Record<Tag | string, HtmlStyle>;
 
@@ -111,18 +110,26 @@ export const createHtmlStylesheet = <T extends HtmlStyles>(
     li: {
       display: 'flex',
       flexDirection: 'row',
+      alignItems: 'flex-start',
     },
     li_bullet: {
-      width: 30,
+      width: 22,
+      minWidth: 22,
       textAlign: 'right',
       flexShrink: 0,
       flexGrow: 0,
-      paddingRight: 5,
+      paddingRight: 4,
     },
     li_content: {
       textAlign: 'left',
       flexGrow: 1,
-      flexBasis: 1,
+      flexShrink: 1,
+      flexBasis: 0,
+      minWidth: 0,
+    },
+    'li p': {
+      marginTop: 0,
+      marginBottom: em(0.5),
     },
     table: {
       display: 'flex',
@@ -162,6 +169,7 @@ export const createHtmlStylesheet = <T extends HtmlStyles>(
       for (const style of Object.keys(base[key])) {
         if (
           !key.startsWith('li_') &&
+          key !== 'li p' &&
           (style.startsWith('margin') ||
             style.startsWith('padding') ||
             style === 'fontSize')

@@ -221,7 +221,7 @@ const renderers: HtmlRenderers = {
     } else if (listStyleType.includes('url(')) {
       bullet = (
         <Image
-          src={listStyleType.match(/\((.*?)\)/)[1].replace(/(['"])/g, '')}
+          src={listStyleType.match(/\((.*?)\)/)?.[1]?.replace(/(['"])/g, '')}
         />
       );
     } else if (ordered) {

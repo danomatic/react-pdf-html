@@ -60,7 +60,7 @@ const convertEntities = (input: string) => {
 };
 
 export const isBlockStyle = (style: HtmlStyle) =>
-  ['block', 'flex'].includes(style.display);
+  style.display && ['block', 'flex'].includes(style.display);
 
 export const hasBlockContent = (element: HtmlElement | string): boolean => {
   if (typeof element === 'string') {
@@ -319,7 +319,14 @@ export const applyStylesheets = (
     .slice()
     .reverse()
     .forEach((stylesheet) => {
-      for (const selector of Object.keys(stylesheet)) {
+      const selectors = Object.keys(stylesheet).sort((a, b) => {
+        const aCompound = a.includes(' ');
+        const bCompound = b.includes(' ');
+        if (aCompound && !bCompound) return -1;
+        if (!aCompound && bCompound) return 1;
+        return 0;
+      });
+      for (const selector of selectors) {
         try {
           const elements = rootElement.querySelectorAll(
             selector
